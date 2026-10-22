@@ -1034,6 +1034,7 @@ footer .footer-credit { margin: 0; padding: 18px 0 22px; border-top: 1px solid r
 .exhibit-modal h2 { font-size: clamp(30px, 3.6vw, 42px); }
 .modal-body .modal-lead { margin: 14px 0 0; line-height: 1.55; }
 .modal-body .booth-challenge { margin: 20px 0 18px; padding: 12px; }
+.modal-lead + .modal-crew, .modal-lead + .booth-ask { margin-top: 20px; }
 .modal-crew { margin-bottom: 18px; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px 20px; }
 .modal-crew .modal-people { margin: 0; }
 .modal-crew .modal-people small { margin-bottom: 6px; }
@@ -1259,7 +1260,10 @@ footer .footer-credit { margin: 0; padding: 18px 0 22px; border-top: 1px solid r
 .admin-dialog-bar > span { color: #6f6873; font: 10px 'DM Mono', monospace; text-transform: uppercase; letter-spacing: .08em; }
 .admin-dialog-bar button { min-height: 40px; padding: 0 14px; display: inline-flex; align-items: center; gap: 10px; border: 1px solid #c9c2ca; border-radius: 99px; background: white; color: var(--ink); font-size: 12px; }
 .admin-dialog .admin-kinds { grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr)); }
-.admin-controls { margin: -24px 0 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; }
+.admin-lockdown { margin: -24px 0 24px; padding: 18px 22px; border-radius: 22px; background: white; }
+.admin-lockdown p { margin: 8px 0 0 54px; color: #5f5763; font-size: 13px; line-height: 1.5; }
+.admin-lockdown .text-button { padding: 0; color: var(--ink); font-size: 13px; font-weight: 700; text-decoration: underline; }
+.admin-controls { margin: 0 0 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; }
 .admin-switch { display: inline-flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 700; cursor: pointer; }
 .admin-switch input { position: absolute; opacity: 0; pointer-events: none; }
 .admin-switch span { position: relative; width: 44px; height: 26px; flex: none; border-radius: 13px; background: rgba(22,12,25,.2); transition: background .2s; }
@@ -1307,7 +1311,8 @@ footer .footer-credit { margin: 0; padding: 18px 0 22px; border-top: 1px solid r
   .leaderboard-points { padding: 22px; border-radius: 22px; }
   .admin-dialog { width: calc(100% - 24px); max-height: calc(100svh - 24px); padding: 20px; border-radius: 18px; }
   .admin-dialog-bar { top: -20px; margin: -20px -20px 24px; padding: 12px 16px; }
-  .admin-controls { margin-top: -12px; }
+  .admin-lockdown { margin-top: -12px; }
+  .admin-lockdown p { margin-left: 0; }
 }
 
 /* Hero foyer: doors open onto a spotlit gallery where the X floats above the floor */

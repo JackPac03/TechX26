@@ -25,7 +25,7 @@ import {
   Trophy,
   X,
 } from 'lucide-react'
-import { boothGuides, boothNumber, exhibits, exhibitUrl, tours, wings, type Exhibit } from './data'
+import { boothGuides, boothNumber, eventDate, exhibits, exhibitUrl, tours, wings, type Exhibit } from './data'
 import { BoothArt } from './BoothArt'
 import { ChallengeSheet } from './ChallengeSheet'
 import { challengeKinds, challenges as boothChallenges } from './challenges'
@@ -55,6 +55,15 @@ const readIds = (key: string) => {
     return []
   }
 }
+
+// Before the event the site is content only: no passport, scanning, challenges or leaderboard.
+// It goes live automatically on the day. The Admin switch overrides this on one device.
+const lockdownKey = 'techx26-lockdown'
+const readLockdown = () => {
+  const saved = localStorage.getItem(lockdownKey)
+  return saved ? saved === '1' : Date.now() < new Date(`${eventDate}T00:00:00`).getTime()
+}
+const startsLocked = readLockdown()
 
 // Opening a booth's QR link (/exhibits/:id) reveals that booth and collects its stamp.
 const linkedExhibit = exhibits.find((exhibit) => (window.location.origin + window.location.pathname).replace(/\/$/, '') === exhibitUrl(exhibit.id))
@@ -143,7 +152,7 @@ function App() {
   const surpriseRef = useRef<HTMLButtonElement>(null)
   const [visited, setVisited] = useState<string[]>(() => {
     const ids = readIds('techx26-visited')
-    if (!linkedExhibit || ids.includes(linkedExhibit.id)) return ids
+    if (!linkedExhibit || ids.includes(linkedExhibit.id) || startsLocked) return ids
     const next = [...ids, linkedExhibit.id]
     localStorage.setItem('techx26-visited', JSON.stringify(next))
     recordStampTime(linkedExhibit.id)
@@ -153,7 +162,7 @@ function App() {
   const [surprisePicks, setSurprisePicks] = useState<string[]>(() => readIds('techx26-surprise-picks'))
   const [trail, setTrail] = useState(() => {
     const saved = readTrail()
-    const next = linkedExhibit ? advanceTrail(saved, linkedExhibit.id) : saved
+    const next = linkedExhibit && !startsLocked ? advanceTrail(saved, linkedExhibit.id) : saved
     if (next !== saved) localStorage.setItem(trailKey, JSON.stringify(next))
     return next
   })
@@ -165,12 +174,12 @@ function App() {
   const [discovery, setDiscovery] = useState<{ title: string; detail: string } | null>(null)
   const [found, setFound] = useState<string[]>(() => {
     const ids = readSecrets()
-    if (!linkedSecret || ids.includes(linkedSecret.id)) return ids
+    if (!linkedSecret || ids.includes(linkedSecret.id) || startsLocked) return ids
     const next = [...ids, linkedSecret.id]
     localStorage.setItem(secretsKey, JSON.stringify(next))
     return next
   })
-  const [secretShown, setSecretShown] = useState<{ secret: Secret; isNew: boolean } | null>(() => linkedSecret ? { secret: linkedSecret, isNew: linkedSecretIsNew } : null)
+  const [secretShown, setSecretShown] = useState<{ secret: Secret; isNew: boolean } | null>(() => linkedSecret && !startsLocked ? { secret: linkedSecret, isNew: linkedSecretIsNew } : null)
   const [xFound, setXFound] = useState(() => localStorage.getItem('techx26-x-found') === '1')
   const [xTaps, setXTaps] = useState({ count: 0, last: 0, spin: 0, burst: 0 })
   const [ticketOpen, setTicketOpen] = useState(false)
@@ -182,9 +191,17 @@ function App() {
   const [demoBoard, setDemoBoard] = useState(() => localStorage.getItem('techx26-demo-leaderboard') === '1')
   const [scanOpen, setScanOpen] = useState(false)
   const [shareOpen, setShareOpen] = useState(false)
-  const [celebration, setCelebration] = useState<Celebration | null>(() => linkedExhibit && linkedIsNew ? celebrate(linkedExhibit, visited) : null)
+  const [celebration, setCelebration] = useState<Celebration | null>(() => linkedExhibit && linkedIsNew && !startsLocked ? celebrate(linkedExhibit, visited) : null)
   const [qrOpen, setQrOpen] = useState(false)
   const [adminOpen, setAdminOpen] = useState(false)
+  const [lockdown, setLockdown] = useState(startsLocked)
+  // Stamps stay saved during lockdown but aren't shown.
+  const shownVisited = lockdown ? [] : visited
+  const changeLockdown = (on: boolean | null) => {
+    if (on === null) localStorage.removeItem(lockdownKey)
+    else localStorage.setItem(lockdownKey, on ? '1' : '0')
+    setLockdown(readLockdown())
+  }
   const [scrolled, setScrolled] = useState(false)
   // The foyer doors open on every page load, except for people who prefer reduced motion.
   const [foyerDoors] = useState(() => !matchMedia('(prefers-reduced-motion: reduce)').matches)
@@ -440,14 +457,14 @@ function App() {
     return true
   }
 
-  const nextUp = selectedExhibit ? nextStop(selectedExhibit.id, visited) : undefined
-  const mysteryMatch = trail.started && mysteryStops[trail.step]?.id === selectedExhibit?.id
+  const nextUp = selectedExhibit ? nextStop(selectedExhibit.id, shownVisited) : undefined
+  const mysteryMatch = !lockdown && trail.started && mysteryStops[trail.step]?.id === selectedExhibit?.id
   const challengeSheet = playing && <ChallengeSheet key={playing.id + playing.demo} demo={playing.demo} challenge={boothChallenges[playing.id]} accent={wings.find((wing) => wing.id === exhibits.find((exhibit) => exhibit.id === playing.id)!.wingId)!.colour} onClose={() => setPlaying(null)} onComplete={(points) => completeChallenge(playing.id, points)} />
 
   return (
     <div className="app-shell">
       <header className={['site-header', scrolled && 'scrolled', menuOpen && 'menu-open'].filter(Boolean).join(' ')}>
-        <a className="brand" href="#top" aria-label="TECHx26 Museum home" onClick={greetLogo}>
+        <a className="brand" href="#top" aria-label="TECHx26 Museum home" onClick={lockdown ? undefined : greetLogo}>
           <span className="brand-mark">TECH<span>x</span>26</span>
           <span className="brand-subtitle">Museum of Technology</span>
         </a>
@@ -455,9 +472,11 @@ function App() {
           <a href="#map"><b>Map</b></a>
           <a href="#schedule"><b>Schedule</b></a>
           <a href="#tours"><b>Tours</b></a>
-          <a href="#passport"><b>Passport</b><span>{visited.length}</span></a>
-          <a href="#leaderboard"><b>Leaderboard</b></a>
-          <button className="nav-scan" onClick={() => setScanOpen(true)}><QrCode size={16} /> Scan QR</button>
+          {!lockdown && <>
+            <a href="#passport"><b>Passport</b><span>{visited.length}</span></a>
+            <a href="#leaderboard"><b>Leaderboard</b></a>
+            <button className="nav-scan" onClick={() => setScanOpen(true)}><QrCode size={16} /> Scan QR</button>
+          </>}
         </nav>
         <button className="menu-button" onClick={() => setMenuOpen(!menuOpen)} aria-label={menuOpen ? 'Close menu' : 'Open menu'} aria-expanded={menuOpen} aria-controls="mobile-menu"><i /><i /></button>
       </header>
@@ -471,14 +490,14 @@ function App() {
           { href: '#map', icon: <Map />, label: 'Venue map', detail: 'Kogarah Front & Back', active: activeSection === 'map' },
           { href: '#passport', icon: <TicketCheck />, label: 'Passport', detail: `${visited.length} of ${exhibits.length} stamps`, active: activeSection === 'passport' },
           { href: '#leaderboard', icon: <Trophy />, label: 'Leaderboard', detail: 'Points and prizes', active: activeSection === 'leaderboard' },
-        ].map((item, index) => (
+        ].filter((item) => !lockdown || (item.href !== '#passport' && item.href !== '#leaderboard')).map((item, index) => (
           <a key={item.href} href={item.href} onClick={() => setMenuOpen(false)} aria-current={item.active ? 'true' : undefined} style={{ '--i': index } as React.CSSProperties}>
             {item.icon}<span><b>{item.label}</b><small>{item.detail}</small></span><ArrowRight />
           </a>
         ))}
         <button className="menu-surprise" onClick={() => { setMenuOpen(false); surpriseMe() }} style={{ '--i': 6 } as React.CSSProperties}><Sparkles /> Surprise me with a booth</button>
         <div className="menu-extras" style={{ '--i': 7 } as React.CSSProperties}>
-          <button className="menu-surprise" onClick={() => { setMenuOpen(false); setReportOpen(true) }}><Play /> Exhibit report</button>
+          {!lockdown && <button className="menu-surprise" onClick={() => { setMenuOpen(false); setReportOpen(true) }}><Play /> Exhibit report</button>}
           <button className="menu-surprise" onClick={() => { setMenuOpen(false); setTicketOpen(true) }}><Ticket /> Museum ticket</button>
         </div>
       </nav>
@@ -499,7 +518,9 @@ function App() {
             </h1>
             <p className="hero-intro">A living museum of the ideas, people and technology shaping the future of banking.</p>
             <div className="hero-actions">
-              <button className="button button-primary hero-scan" onClick={() => setScanOpen(true)}><QrCode size={19} /> Scan booth QR</button>
+              {lockdown
+                ? <a className="button button-primary hero-scan" href="#map"><Map size={19} /> Explore the map</a>
+                : <button className="button button-primary hero-scan" onClick={() => setScanOpen(true)}><QrCode size={19} /> Scan booth QR</button>}
               <a className="button button-ghost" href="#wings">Browse the museum <ArrowDown size={17} /></a>
             </div>
           </div>
@@ -507,7 +528,7 @@ function App() {
             <div className="foyer-spot" />
             <div className="foyer-glow" />
             <div className="foyer-shadow" />
-            <div className={xTaps.burst && !xTaps.count ? 'foyer-x spin' : 'foyer-x'} onClick={tapX} style={{ transform: `rotateY(${xTaps.spin}deg) rotate(${xTaps.count % 2 ? 8 : xTaps.count ? -8 : 0}deg) scale(${1 + xTaps.count * 0.05})` }}>
+            <div className={xTaps.burst && !xTaps.count ? 'foyer-x spin' : 'foyer-x'} onClick={lockdown ? undefined : tapX} style={{ transform: `rotateY(${xTaps.spin}deg) rotate(${xTaps.count % 2 ? 8 : xTaps.count ? -8 : 0}deg) scale(${1 + xTaps.count * 0.05})` }}>
               <div className="techx-ribbon ribbon-one" />
               <div className="techx-ribbon ribbon-two" />
               <div className="techx-ribbon ribbon-shine" />
@@ -536,12 +557,12 @@ function App() {
           {foyerDoors && <div className="hero-doors" aria-hidden="true"><i><b>TECH</b></i><i><b>x26</b></i></div>}
         </section>
 
-        <section className="scan-intro" aria-label="How exhibit scanning works" data-reveal>
+        {!lockdown && <section className="scan-intro" aria-label="How exhibit scanning works" data-reveal>
           <div className="scan-intro-icon"><QrCode /></div>
           <div><p className="kicker">At a booth?</p><h2>Scan. Discover. Collect.</h2><span>Scan the exhibit QR to reveal its story and add a unique stamp to your passport.</span></div>
           <button className="button button-primary" onClick={() => setScanOpen(true)}>Scan now <Camera size={17} /></button>
           <div className="scan-progress"><strong>{visited.length}/{exhibits.length}</strong><span>stamps collected</span></div>
-        </section>
+        </section>}
 
         <Schedule onOpen={openExhibit} />
 
@@ -574,7 +595,7 @@ function App() {
           </div>
         </section>
 
-        <ExplorerAdventures trail={trail} onStart={() => setTrailStarted(true)} onPause={() => setTrailStarted(false)} onHint={() => goToMap({ hintId: mysteryStops[trail.step].id })} onQuiz={() => setQuizOpen(true)} />
+        {!lockdown && <ExplorerAdventures trail={trail} onStart={() => setTrailStarted(true)} onPause={() => setTrailStarted(false)} onHint={() => goToMap({ hintId: mysteryStops[trail.step].id })} onQuiz={() => setQuizOpen(true)} />}
 
         <section className="section exhibit-section" id="exhibits">
           <div className="section-heading exhibit-heading" data-reveal>
@@ -632,7 +653,7 @@ function App() {
           )}
         </section>
 
-        <section className="passport-section" id="passport">
+        {!lockdown && <section className="passport-section" id="passport">
           <div className="passport-copy" data-reveal>
             <p className="kicker light">Your digital passport</p>
             <h2>Collect moments.<br />Unlock perspectives.</h2>
@@ -672,19 +693,19 @@ function App() {
               <ExplorerPassport journey={journey} />
             </div>
           </div>
-        </section>
+        </section>}
 
-        <Leaderboard visited={visited} results={results} secrets={found} demo={demoBoard} />
+        {!lockdown && <Leaderboard visited={visited} results={results} secrets={found} demo={demoBoard} />}
 
         <section className="map-section" id="map">
-          <TourMap key={mapRequest.key} initialTourId={mapRequest.tourId} initialHintId={mapRequest.hintId} visited={visited} saved={saved} onOpen={openExhibit} />
+          <TourMap key={mapRequest.key} initialTourId={mapRequest.tourId} initialHintId={mapRequest.hintId} visited={shownVisited} saved={saved} onOpen={openExhibit} />
         </section>
 
-        <section className="scan-cta" data-reveal>
+        {!lockdown && <section className="scan-cta" data-reveal>
           <div className="scan-cta-art" aria-hidden="true"><QrCode /><span /><span /></div>
           <div><p className="kicker light">Your passport is in your pocket</p><h2>Every booth holds<br />a new discovery.</h2></div>
           <div><p>Look for the TECHx QR at each exhibit. One scan opens the story and collects your stamp.</p><button className="button button-light" onClick={() => setScanOpen(true)}>Scan an exhibit <Camera size={17} /></button></div>
-        </section>
+        </section>}
       </main>
 
       <footer>
@@ -700,7 +721,7 @@ function App() {
         <p className="footer-credit">Created by Jack Hodges – 2026 Technology Graduate</p>
       </footer>
 
-      <button className="scan-fab" onClick={() => setScanOpen(true)} aria-label="Scan exhibit QR"><QrCode size={18} /><span>Scan exhibit</span></button>
+      {!lockdown && <button className="scan-fab" onClick={() => setScanOpen(true)} aria-label="Scan exhibit QR"><QrCode size={18} /><span>Scan exhibit</span></button>}
 
       {surpriseRoll && (
         <div className="modal-backdrop" role="presentation" onMouseDown={cancelSurprise}>
@@ -742,11 +763,11 @@ function App() {
               <h2 id="modal-title">{selectedExhibit.title}</h2>
               <p className="modal-lead">{selectedExhibit.description}</p>
               {mysteryMatch && <div className="mystery-match"><KeyRound size={19} /><div><strong>You found mystery stop {trail.step + 1}!</strong><p>{visited.includes(selectedExhibit.id) ? 'Already in your passport. Confirm this stop below to reveal your next clue.' : 'Collect this booth’s passport stamp to solve the clue.'}</p></div></div>}
-              <div className={challenges.includes(selectedExhibit.id) ? 'booth-challenge done' : 'booth-challenge'}>
+              {!lockdown && <div className={challenges.includes(selectedExhibit.id) ? 'booth-challenge done' : 'booth-challenge'}>
                 <span className="booth-challenge-icon" aria-hidden="true">{challenges.includes(selectedExhibit.id) ? <Check /> : <Sparkles />}</span>
                 <div><small>Booth challenge · {challengeKinds[boothChallenges[selectedExhibit.id].kind]}{results[selectedExhibit.id] ? ` · Best ${results[selectedExhibit.id]} pts` : ` · Up to 100 pts`}</small><p><b>{boothChallenges[selectedExhibit.id].title}.</b> {boothChallenges[selectedExhibit.id].intro}</p></div>
                 <button onClick={() => setPlaying({ id: selectedExhibit.id })}>{challenges.includes(selectedExhibit.id) ? 'Play again' : boothChallenges[selectedExhibit.id].kind === 'code' ? 'Enter code' : 'Play'}</button>
-              </div>
+              </div>}
               {(selectedExhibit.hosts.length > 0 || selectedExhibit.partners.length > 0) && (
                 <div className="modal-crew">
                   {selectedExhibit.hosts.length > 0 && <div className="modal-people"><small>Hosted by</small><p>{selectedExhibit.hosts.join(', ')}</p></div>}
@@ -755,10 +776,10 @@ function App() {
               )}
               <div className="booth-ask"><small><MessageCircle size={13} /> Ask the team</small><ul>{boothGuides[selectedExhibit.id].ask.map((question) => <li key={question}>{question}</li>)}</ul></div>
               <div className="modal-actions">
-                <button className={visited.includes(selectedExhibit.id) ? 'stamp-button done' : 'stamp-button'} onClick={() => stampExhibit(selectedExhibit.id)} aria-pressed={visited.includes(selectedExhibit.id)}>
+                {!lockdown && <button className={visited.includes(selectedExhibit.id) ? 'stamp-button done' : 'stamp-button'} onClick={() => stampExhibit(selectedExhibit.id)} aria-pressed={visited.includes(selectedExhibit.id)}>
                   <span className="stamp-button-seal" aria-hidden="true">{visited.includes(selectedExhibit.id) ? <Check size={19} /> : <Star size={18} />}</span>
                   <span className="stamp-button-copy"><b>{mysteryMatch && visited.includes(selectedExhibit.id) ? 'Confirm this stop' : visited.includes(selectedExhibit.id) ? 'Stamp collected' : 'Collect passport stamp'}</b><small>{visited.includes(selectedExhibit.id) ? `${visited.length} of ${exhibits.length} in your passport` : 'Add this booth to your passport'}</small></span>
-                </button>
+                </button>}
                 {nextUp && (
                   <button className="next-stop" onClick={() => openExhibit(nextUp.exhibit)} style={{ '--accent': wings.find((wing) => wing.id === nextUp.exhibit.wingId)!.colour } as React.CSSProperties}>
                     <BoothArt id={nextUp.exhibit.id} className="next-stop-icon" />
@@ -769,13 +790,13 @@ function App() {
               </div>
             </div>
             <div className="modal-map">
-              <VenueMap key={selectedExhibit.id} compact focus={selectedExhibit.id} visited={visited} saved={saved} onOpen={openExhibit} />
+              <VenueMap key={selectedExhibit.id} compact focus={selectedExhibit.id} visited={shownVisited} saved={saved} onOpen={openExhibit} />
             </div>
           </section>
         </div>
       )}
 
-      {adminOpen ? <AdminPanel demo={demoBoard} onDemo={showDemoBoard} onTry={(id) => setPlaying({ id, demo: true })} onReset={resetProgress} onClose={() => setAdminOpen(false)}>{challengeSheet}</AdminPanel> : challengeSheet}
+      {adminOpen ? <AdminPanel lockdown={lockdown} lockdownSet={localStorage.getItem(lockdownKey) !== null} onLockdown={changeLockdown} demo={demoBoard} onDemo={showDemoBoard} onTry={(id) => setPlaying({ id, demo: true })} onReset={resetProgress} onClose={() => setAdminOpen(false)}>{challengeSheet}</AdminPanel> : challengeSheet}
 
       {qrOpen && <QrStudio onClose={() => setQrOpen(false)} />}
 

@@ -40,7 +40,7 @@ const todos = [
 const todoKey = 'techx26-admin-todo'
 
 // Challenge demos for booth hosts, opened from the footer.
-export function AdminPanel({ demo, onDemo, onTry, onReset, onClose, children }: { demo: boolean; onDemo: (on: boolean) => void; onTry: (id: string) => void; onReset: () => void; onClose: () => void; children?: ReactNode }) {
+export function AdminPanel({ lockdown, lockdownSet, onLockdown, demo, onDemo, onTry, onReset, onClose, children }: { lockdown: boolean; lockdownSet: boolean; onLockdown: (on: boolean | null) => void; demo: boolean; onDemo: (on: boolean) => void; onTry: (id: string) => void; onReset: () => void; onClose: () => void; children?: ReactNode }) {
   const dialogRef = useRef<HTMLDialogElement>(null)
   const [done, setDone] = useState<string[]>(() => JSON.parse(localStorage.getItem(todoKey) ?? '[]'))
   const toggle = (id: string) => {
@@ -68,6 +68,10 @@ export function AdminPanel({ demo, onDemo, onTry, onReset, onClose, children }: 
       <div className="section-heading">
         <div><p className="kicker">Admin · temporary</p><h2 id="admin-title">Challenge library.</h2></div>
         <p>Every type of booth challenge, ready to demo. Demos don’t save points or ask for details.</p>
+      </div>
+      <div className="admin-lockdown">
+        <label className="admin-switch"><input type="checkbox" checked={lockdown} onChange={(event) => onLockdown(event.target.checked)} /><span aria-hidden="true" />Lockdown mode: content only</label>
+        <p>Hides the passport, scanning, challenges and leaderboard so visitors just see the map, schedule, tours and booths. It’s on for everyone until 27 November and switches off automatically on the day. This switch only changes this device.{lockdownSet && <> <button className="text-button" onClick={() => onLockdown(null)}>Back to automatic</button></>}</p>
       </div>
       <div className="admin-controls">
         <label className="admin-switch"><input type="checkbox" checked={demo} onChange={(event) => onDemo(event.target.checked)} /><span aria-hidden="true" />Show demo players on the leaderboard</label>
