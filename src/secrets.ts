@@ -34,7 +34,7 @@ export const secrets: Secret[] = [
   },
 ]
 
-export const secretUrl = (secret: Secret) => `${window.location.origin}/secret/${secret.code}`
+export const secretUrl = (secret: Secret) => `${window.location.origin}${import.meta.env.BASE_URL}secret/${secret.code}`
 export const findSecret = (value: string) => {
   const code = value.trim().toLowerCase().split('/').filter(Boolean).pop() ?? ''
   return secrets.find((secret) => secret.code === code)

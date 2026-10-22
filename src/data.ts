@@ -157,4 +157,4 @@ export const schedule: Session[] = [
 export const boothNumber = (exhibit: Exhibit) => String(exhibit.booth).padStart(2, '0')
 
 // Booth QR codes deep-link here; opening the link reveals the booth and awards its stamp.
-export const exhibitUrl = (id: string) => `${window.location.origin}/exhibits/${id}`
+export const exhibitUrl = (id: string) => `${window.location.origin}${import.meta.env.BASE_URL}exhibits/${id}`

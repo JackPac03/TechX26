@@ -60,7 +60,7 @@ const readIds = (key: string) => {
 const linkedExhibit = exhibits.find((exhibit) => (window.location.origin + window.location.pathname).replace(/\/$/, '') === exhibitUrl(exhibit.id))
 const linkedIsNew = Boolean(linkedExhibit && !readIds('techx26-visited').includes(linkedExhibit.id))
 // Secret QR codes (/secret/:code) reveal a hidden exhibit.
-const linkedSecret = window.location.pathname.startsWith('/secret/') ? findSecret(window.location.pathname) : undefined
+const linkedSecret = window.location.pathname.startsWith(`${import.meta.env.BASE_URL}secret/`) ? findSecret(window.location.pathname) : undefined
 const linkedSecretIsNew = Boolean(linkedSecret && !readSecrets().includes(linkedSecret.id))
 
 const celebrate = (exhibit: Exhibit, visited: string[]): Celebration => {
@@ -192,7 +192,7 @@ function App() {
   const [activeSection, setActiveSection] = useState('')
 
   useEffect(() => {
-    if (linkedExhibit || linkedSecret) window.history.replaceState(null, '', '/')
+    if (linkedExhibit || linkedSecret) window.history.replaceState(null, '', import.meta.env.BASE_URL)
   }, [])
 
   useEffect(() => {
