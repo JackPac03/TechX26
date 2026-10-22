@@ -1,5 +1,5 @@
-import { useEffect, useRef, type ReactNode } from 'react'
-import { Play, RotateCcw, X } from 'lucide-react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { Check, Play, RotateCcw, X } from 'lucide-react'
 import { BoothArt } from './BoothArt'
 import { challenges, type Challenge } from './challenges'
 import { boothNumber, exhibits, wings } from './data'
@@ -15,7 +15,7 @@ const kinds: Record<Challenge['kind'], { name: string; detail: string }> = {
   memory: { name: 'Memory flip', detail: 'Flip cards to find every matching pair.' },
   packets: { name: 'Packet patrol', detail: 'Tap the threats before they hit the network, against the clock.' },
   phish: { name: 'Spot the phish', detail: 'Decide whether each message is safe or a scam.' },
-  simon: { name: 'Recovery drill', detail: 'Watch a growing sequence and repeat it.' },
+  simon: { name: 'Sequence drill', detail: 'Watch a growing sequence and repeat it.' },
   bugs: { name: 'Bug hunt', detail: 'Tap the line with the bug in each code snippet.' },
   password: { name: 'Passphrase builder', detail: 'Build a passphrase that passes every check.' },
   contrast: { name: 'Contrast check', detail: 'Pick the more readable colour combination.' },
@@ -23,9 +23,31 @@ const kinds: Record<Challenge['kind'], { name: string; detail: string }> = {
   pedal: { name: 'Pedal power', detail: 'Tap as fast as you can before time runs out.' },
 }
 
+// Open questions for the organisers. Ticks are kept on this device.
+const noHosts = exhibits.filter((exhibit) => !exhibit.hosts.length && !exhibit.activity && exhibit.id !== 'eag')
+const todos = [
+  { id: 'eag', text: 'EAG content is a placeholder. Confirm its description, hosts, conversation starters and challenge (code word VOICE).' },
+  { id: 'hosts', text: `Find hosts for ${noHosts.map((exhibit) => exhibit.title).join(', ')}.` },
+  { id: 'cyber-hosts', text: 'All five cyber booths list Ashley Nicol as host. Confirm who runs each one.' },
+  { id: 'numbers', text: 'Confirm official booth numbers. We assigned 44–50 to the new booths.' },
+  { id: 'digital-strategy', text: 'Digital Strategy appears twice on the floor plan (G.07 and the G.08 pod). The map only shows the G.08 pod.' },
+  { id: 'tree', text: 'Confirm the green tree on the floor plan is the Christmas tree.' },
+  { id: 'removed', text: 'Udemy and Employee Benefits aren’t on the new floor plan, so they were removed. Confirm they aren’t coming.' },
+  { id: 'codes', text: `Brief hosts on their code words. ${exhibits.filter((exhibit) => challenges[exhibit.id].kind === 'code').length} booths use a Find out challenge.` },
+  { id: 'qr', text: 'Reprint booth QR posters: the cyber booths split, Testing and Cyber Mate merged, and EAG is new.' },
+  { id: 'leaderboard', text: 'Points and the leaderboard are saved on each device only. Connect them to on-prem storage before the event.' },
+]
+const todoKey = 'techx26-admin-todo'
+
 // Challenge demos for booth hosts, opened from the footer.
 export function AdminPanel({ demo, onDemo, onTry, onReset, onClose, children }: { demo: boolean; onDemo: (on: boolean) => void; onTry: (id: string) => void; onReset: () => void; onClose: () => void; children?: ReactNode }) {
   const dialogRef = useRef<HTMLDialogElement>(null)
+  const [done, setDone] = useState<string[]>(() => JSON.parse(localStorage.getItem(todoKey) ?? '[]'))
+  const toggle = (id: string) => {
+    const next = done.includes(id) ? done.filter((item) => item !== id) : [...done, id]
+    setDone(next)
+    localStorage.setItem(todoKey, JSON.stringify(next))
+  }
   useEffect(() => {
     const dialog = dialogRef.current!
     dialog.showModal()
@@ -50,6 +72,20 @@ export function AdminPanel({ demo, onDemo, onTry, onReset, onClose, children }: 
       <div className="admin-controls">
         <label className="admin-switch"><input type="checkbox" checked={demo} onChange={(event) => onDemo(event.target.checked)} /><span aria-hidden="true" />Show demo players on the leaderboard</label>
         <button className="admin-reset" onClick={() => { if (confirm('Reset your stamps, challenges, points and details on this device?')) onReset() }}><RotateCcw size={15} /> Reset my progress</button>
+      </div>
+      <div className="admin-todo">
+        <h3>To do<small>{todos.filter((todo) => done.includes(todo.id)).length} of {todos.length} done</small></h3>
+        <ul>
+          {todos.map((todo) => (
+            <li key={todo.id}>
+              <label className={done.includes(todo.id) ? 'done' : ''}>
+                <input type="checkbox" checked={done.includes(todo.id)} onChange={() => toggle(todo.id)} />
+                <span className="admin-todo-box" aria-hidden="true"><Check size={13} strokeWidth={3} /></span>
+                {todo.text}
+              </label>
+            </li>
+          ))}
+        </ul>
       </div>
       <div className="admin-kinds">
         {byKind.map(({ kind, booths }) => (

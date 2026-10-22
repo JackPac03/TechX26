@@ -13,7 +13,7 @@ export function explorerTitle(visited: string[]) {
 }
 
 export const mysteryStops = [
-  { id: 'cyber', clue: 'Every good museum needs a guardian. Find the team keeping the bank safe from digital threats.' },
+  { id: 'cyber-threats-247', clue: 'Every good museum needs a guardian. Find the team keeping the bank safe from digital threats.' },
   { id: 'github', clue: 'Pull requests, shared code and a rather famous octocat. Where do the builders keep their work?' },
   { id: 'tour-de-cure', clue: 'Two wheels. One cause. Find the team riding towards a cure.' },
 ]

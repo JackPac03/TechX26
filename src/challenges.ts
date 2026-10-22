@@ -53,19 +53,24 @@ export const challenges: Record<string, Challenge> = {
       { q: 'The safest place to download a banking app is…', options: ['A link in a text message', 'The official app store', 'A pop-up ad', 'A file a friend sent'], answer: 1 },
     ],
   },
-  'ecm-perform': { kind: 'code', title: 'Numbers that matter', intro: 'Find out what ECM - Perform measures and one number the team is proud of. They’ll give you the code word.', code: 'MOMENTUM' },
-  'employee-benefits': { kind: 'code', title: 'Hidden perks', intro: 'Discover one benefit you didn’t know you had. The team will give you the code word.', code: 'WELLBEING' },
-  'ethan-indigenous': { kind: 'code', title: 'Learn and share', intro: 'Learn one thing about Ethan Indigenous’s work. The team will give you the code word.', code: 'CONNECT' },
-  'tour-de-cure': { kind: 'pedal', title: 'Pedal power', intro: 'Tap as fast as you can to ride 60 pedal strokes in 10 seconds.' },
-  'cyber-mate': { kind: 'phish', title: 'Spot the phish', intro: 'Is each message safe or a phish? Get 5 of 6 right.' },
-  'asset-management': {
-    kind: 'quiz', title: 'Money basics', intro: 'Three questions on investing.', questions: [
-      { q: 'Spreading your money across different investments is called…', options: ['Diversification', 'Inflation', 'Leverage', 'Liquidation'], answer: 0 },
-      { q: 'Over the long term, which usually carries more risk and more return?', options: ['Cash', 'Shares'], answer: 1 },
-      { q: 'Compound interest means…', options: ['Interest charged twice', 'Earning interest on your interest', 'A fixed interest rate', 'Interest paid in cash'], answer: 1 },
+  'cloud-services': {
+    kind: 'quiz', title: 'Head in the clouds', intro: 'Three quick questions on cloud computing.', questions: [
+      { q: 'What does “the cloud” mean in technology?', options: ['Weather data for apps', 'Computing services delivered over the internet', 'A type of hard drive', 'The office Wi-Fi'], answer: 1 },
+      { q: 'Adding capacity automatically on a busy day is called…', options: ['Latency', 'Encryption', 'Elastic scaling', 'Caching'], answer: 2 },
+      { q: 'Which of these is a cloud provider?', options: ['AWS', 'Excel', 'Notepad', 'Paint'], answer: 0 },
     ],
   },
-  bcm: { kind: 'simon', title: 'Recovery drill', intro: 'Systems are coming back online. Watch the order, then repeat it. Reach a sequence of 5.' },
+  'ecm-perform': { kind: 'code', title: 'Numbers that matter', intro: 'Find out what ECM - Perform measures and one number the team is proud of. They’ll give you the code word.', code: 'MOMENTUM' },
+  'ethan-indigenous': { kind: 'code', title: 'Learn and share', intro: 'Learn one thing about Ethan Indigenous’s work. The team will give you the code word.', code: 'CONNECT' },
+  'tour-de-cure': { kind: 'pedal', title: 'Pedal power', intro: 'Tap as fast as you can to ride 60 pedal strokes in 10 seconds.' },
+  'asset-management': {
+    kind: 'quiz', title: 'App audit', intro: 'Three questions on looking after the bank’s apps and assets.', questions: [
+      { q: 'An IT asset register keeps track of…', options: ['Customer savings balances', 'Every app, device and licence we own', 'Meeting room bookings', 'Office plants'], answer: 1 },
+      { q: 'Switching off an app that’s no longer needed is called…', options: ['Decommissioning', 'Onboarding', 'Refactoring', 'Branching'], answer: 0 },
+      { q: 'Why keep track of software licences?', options: ['To make apps run faster', 'To change the logo', 'To stay compliant and stop paying for unused ones', 'To back up emails'], answer: 2 },
+    ],
+  },
+  bcm: { kind: 'simon', title: 'Control check', intro: 'Monitoring alerts are lighting up. Watch the order, then repeat it. Reach a sequence of 5.' },
   testing: { kind: 'bugs', title: 'Bug hunt', intro: 'Tap the line with the bug in each snippet. Find 2 of 3.' },
   'family-feud': {
     kind: 'quiz', title: 'Feud facts', intro: 'Do you know when and where the big game is?', questions: [
@@ -74,8 +79,12 @@ export const challenges: Record<string, Challenge> = {
       { q: 'Where is it on?', options: ['The Kitchen', 'The Auditorium', 'The Tech Bar', 'Kogarah Back'], answer: 1 },
     ],
   },
-  cyber: { kind: 'password', title: 'Lock it down', intro: 'Build a passphrase that passes every check. It never leaves your device.' },
-  udemy: { kind: 'scramble', title: 'Learning scramble', intro: 'Unscramble the words. Tap the letters in order.', words: [{ word: 'COURSE', hint: 'What you enrol in' }, { word: 'SKILLS', hint: 'What you build' }, { word: 'LEARNING', hint: 'What it’s all about' }] },
+  'cyber-trusted-access': { kind: 'match', title: 'Access granted', intro: 'Match each access control to what it does.', pairs: [['MFA', 'A second check, like a code on your phone'], ['Least privilege', 'Only the access you need for your job'], ['Single sign-on', 'One login for many systems'], ['Access review', 'Regularly checking who can access what']] },
+  'cyber-job-zero': { kind: 'password', title: 'Lock it down', intro: 'Security is job zero, starting with your own login. Build a passphrase that passes every check. It never leaves your device.' },
+  'cyber-critical-systems': { kind: 'code', title: 'Guard the crown jewels', intro: 'Ask the team which system they’d protect first, and why. They’ll give you the code word.', code: 'FORTRESS' },
+  'cyber-threats-247': { kind: 'order', title: 'Threat response', intro: 'A threat has been spotted. Put the response steps in order.', steps: ['Detect the threat', 'Contain it', 'Remove it', 'Recover systems', 'Learn and improve'] },
+  'cyber-people-safe': { kind: 'phish', title: 'Spot the phish', intro: 'Is each message safe or a phish? Get 5 of 6 right.' },
+  eag: { kind: 'code', title: 'Have your say', intro: 'Share one idea that would make Westpac a better place to work. The team will give you the code word.', code: 'VOICE' },
   'linkedin-learning': {
     kind: 'quiz', title: 'Profile pro', intro: 'Three questions to level up your LinkedIn.', questions: [
       { q: 'Which profile section lists what you’re good at?', options: ['Skills', 'Activity', 'Groups', 'Events'], answer: 0 },
@@ -92,7 +101,7 @@ export const challenges: Record<string, Challenge> = {
       { q: 'Which two areas is the museum spread across?', options: ['Kogarah Front and Back', 'Levels 1 and 2', 'East and West', 'North and South'], answer: 0 },
     ],
   },
-  'head-shot-photo-booth': { kind: 'code', title: 'Say cheese', intro: 'Get your new head shot. The photographer will give you the code word.', code: 'SMILE' },
+  'head-shot-photo-booth': { kind: 'code', title: 'Say cheese', intro: 'Get your photo at the Rapid Photo Booth. The photographer will give you the code word.', code: 'SMILE' },
   'women-in-technology': {
     kind: 'quiz', title: 'Tech trailblazers', intro: 'Women who changed technology.', questions: [
       { q: 'Who is often called the first computer programmer?', options: ['Ada Lovelace', 'Marie Curie', 'Grace Kelly', 'Rosalind Franklin'], answer: 0 },
@@ -120,8 +129,8 @@ export const challenges: Record<string, Challenge> = {
       { q: 'ServiceNow is mainly used to…', options: ['Edit photos', 'Manage IT requests and incidents', 'Write code', 'Host websites'], answer: 1 },
     ],
   },
-  'ai-sdlc': { kind: 'order', title: 'Ship it', intro: 'Put the software development lifecycle in order.', steps: ['Plan', 'Design', 'Build', 'Test', 'Deploy', 'Monitor'] },
-  wdlc: { kind: 'code', title: 'Decode WDLC', intro: 'Ask the team what WDLC stands for. They’ll give you the code word.', code: 'FLOW' },
+  'ai-sdlc': { kind: 'order', title: 'Ship it', intro: 'Put the service delivery life cycle in order.', steps: ['Understand the need', 'Design the service', 'Build and test', 'Release', 'Operate and support', 'Improve'] },
+  wdlc: { kind: 'code', title: 'Stage favourite', intro: 'Ask the team which stage of the Westpac Delivery Life Cycle matters most to them. They’ll give you the code word.', code: 'FLOW' },
   'snowflake-adapt': {
     kind: 'quiz', title: 'Data drill', intro: 'Three questions on data.', questions: [
       { q: 'Snowflake is best known as a…', options: ['Cloud data platform', 'Weather app', 'Design tool', 'Video service'], answer: 0 },
@@ -131,6 +140,7 @@ export const challenges: Record<string, Challenge> = {
   },
   github: { kind: 'match', title: 'Git it', intro: 'Match each Git action to what it does.', pairs: [['Clone', 'Copy a repository to your machine'], ['Commit', 'Save a snapshot of your changes'], ['Push', 'Send your commits to the remote'], ['Pull request', 'Propose changes for review']] },
   'jira-confluence': { kind: 'order', title: 'Ticket to done', intro: 'Move the ticket through the board in order.', steps: ['To do', 'In progress', 'In review', 'Done'] },
+  'engineering-excellence': { kind: 'scramble', title: 'Craft scramble', intro: 'Unscramble the words. Tap the letters in order.', words: [{ word: 'QUALITY', hint: 'What excellence looks like' }, { word: 'REVIEW', hint: 'A second pair of eyes on code' }, { word: 'AUTOMATE', hint: 'Let the pipeline do the repetitive work' }] },
 }
 
 export const phishMessages = [

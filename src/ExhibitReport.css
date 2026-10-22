@@ -60,7 +60,6 @@
 .report-spot { position: absolute; left: 50%; top: -10%; width: 150%; height: 90%; translate: -50% 0; background: radial-gradient(ellipse at 50% 0%, rgba(255,230,200,.35), transparent 62%); pointer-events: none; }
 .report-cover-title { font-size: clamp(56px, 17vw, 72px) !important; line-height: .92 !important; letter-spacing: -.06em; }
 .report-cover-title em { display: inline-block; padding: 0 .08em .14em 0; line-height: 1; font-family: 'Playfair Display', Georgia, serif; font-weight: 500; background: linear-gradient(90deg, #ffd1dc, #ffffff); -webkit-background-clip: text; background-clip: text; color: transparent; }
-.report-cover-by { margin: 22px 0 0; font: 500 12px 'DM Mono', monospace; letter-spacing: .16em; text-transform: uppercase; opacity: .85; }
 .report-hint { position: absolute !important; left: 0; right: 0; bottom: calc(66px + env(safe-area-inset-bottom)); margin: 0; font-size: 12px; opacity: .6; }
 
 /* Booth count: their booths orbit like a little solar system */

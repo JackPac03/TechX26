@@ -58,12 +58,11 @@ function FrontDetails() {
       <Room x={250} y={273} w={290} h={207} />
       <Room x={264} y={278} w={256} h={129} />
       <line className="map-wall-thin" x1={264} y1={350} x2={520} y2={350} />
-      <Stairs x={395} y={278} w={46} h={15} />
+      <Stairs x={394} y={278} w={20} h={15} />
       <Stairs x={297} y={334} w={60} h={32} />
       <Stairs x={297} y={390} w={60} h={33} />
       <Stairs x={297} y={453} w={60} h={32} />
       <Room x={341} y={612} w={232} h={292} />
-      <Room x={359} y={618} w={195} h={121} />
       <Stairs x={335} y={662} w={30} h={32} />
       <g className="map-void">
         <rect x={366} y={774} width={193} height={103} />
@@ -73,6 +72,7 @@ function FrontDetails() {
       <path className="map-bridge" d="M171 717 H341" />
       {[215, 232, 249, 266, 283, 300].map((x) => <rect key={x} className="map-bollard" x={x - 2.5} y={703} width={5} height={28} rx={2.5} />)}
       <text className="map-detail-label" x={257.5} y={694}>TURNSTILES</text>
+      <text className="map-detail-label" x={237.5} y={1080}>MAIN ENTRANCE</text>
       <g className="map-room">
         {[328, 382, 436].map((y) => <rect key={y} x={562} y={y} width={28} height={28} />)}
         <path className="map-room-shape" d="M123 910 148 935 V987 L123 1012 M58 1016 79 1037 99 1017" />
@@ -93,9 +93,9 @@ function BackDetails() {
       <rect className="map-lounge" x={62} y={118} width={172} height={455} />
       <Room x={72} y={423} w={64} h={139} />
       <Room x={151} y={423} w={64} h={139} />
-      <Room x={656} y={131} w={196} h={99} />
-      <Room x={656} y={264} w={196} h={98} />
-      <path className="map-room-shape" d="M721 131 V230 M786 131 V230 M656 181 H852 M721 264 V362 M786 264 V362 M656 313 H852" />
+      <Room x={56} y={128} w={190} h={100} />
+      <Room x={56} y={263} w={190} h={100} />
+      <path className="map-room-shape" d="M121 128 V228 M186 128 V228 M56 178 H246 M121 263 V363 M186 263 V363 M56 313 H246" />
       <Room x={453} y={128} w={54} h={73} />
       <Room x={525} y={128} w={54} h={73} />
       <path className="map-room-shape" d="M466 375 H490 V496 L521 551 501 573 466 510Z M520 331 H544 V470 H520Z" />

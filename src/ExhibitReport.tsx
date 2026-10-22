@@ -144,7 +144,6 @@ export function ExhibitReport({ journey, results, found, demo, onClose, onOpen }
         <div className="report-spot" aria-hidden="true" />
         <p className="report-kicker">TECHx26 · Museum of Technology</p>
         <h2 className="report-cover-title">Your<br /><em>exhibit report</em></h2>
-        <p className="report-cover-by">Curated by {name || 'you'}</p>
         <p className="report-hint">Tap to continue · Hold to pause</p>
       </>,
     },

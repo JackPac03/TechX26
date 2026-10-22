@@ -1053,7 +1053,7 @@ footer .footer-credit { margin: 0; padding: 18px 0 22px; border-top: 1px solid r
 /* Pinned popup actions: passport stamp and next stop */
 .modal-body { display: flex; flex-direction: column; padding-bottom: 0; }
 .modal-body > * { flex-shrink: 0; }
-.modal-actions { position: sticky; bottom: 0; z-index: 2; margin: auto -36px 0 -40px; padding: 18px 36px 14px 40px; display: grid; gap: 8px; background: linear-gradient(to bottom, rgba(243,243,237,0), #f3f3ed 20px); }
+.modal-actions { position: sticky; bottom: 0; z-index: 2; margin: auto -36px 0 -40px; padding: 18px 36px 14px 40px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; background: linear-gradient(to bottom, rgba(243,243,237,0), #f3f3ed 20px); }
 .modal-body .modal-actions .next-stop { margin-top: 0; }
 .stamp-button { position: relative; width: 100%; min-height: 58px; padding: 8px 18px 8px 9px; display: flex; align-items: center; gap: 12px; overflow: hidden; border: 0; border-radius: 18px; background: linear-gradient(100deg, #ef1721, #c31672 55%, #9619df); color: white; text-align: left; box-shadow: 0 16px 30px -18px #c31672; transition: transform .2s, box-shadow .25s, background .3s; }
 .stamp-button::after { content: ''; position: absolute; inset: 0 auto 0 -40%; width: 30%; background: linear-gradient(100deg, transparent, rgba(255,255,255,.28), transparent); transform: skewX(-18deg); transition: left .6s ease; }
@@ -1268,6 +1268,17 @@ footer .footer-credit { margin: 0; padding: 18px 0 22px; border-top: 1px solid r
 .admin-switch input:checked + span::after { transform: translateX(18px); }
 .admin-switch input:focus-visible + span { outline: 2px solid var(--ink); outline-offset: 2px; }
 .admin-reset { min-height: 40px; padding: 0 16px; display: inline-flex; align-items: center; gap: 8px; border: 0; border-radius: 20px; background: white; color: var(--ink); font-size: 13px; font-weight: 700; }
+.admin-todo { margin-bottom: 24px; padding: 20px 22px; border-radius: 22px; background: white; }
+.admin-todo h3 { margin: 0 0 10px; display: flex; align-items: baseline; justify-content: space-between; gap: 8px; font-size: 18px; letter-spacing: -.02em; }
+.admin-todo h3 small { color: #8b838e; font: 500 10px 'DM Mono', monospace; letter-spacing: .08em; text-transform: uppercase; }
+.admin-todo ul { margin: 0; padding: 0; list-style: none; }
+.admin-todo li + li { border-top: 1px solid #f0efe9; }
+.admin-todo label { padding: 11px 0; display: flex; align-items: flex-start; gap: 12px; color: #3d3540; font-size: 14px; line-height: 1.45; cursor: pointer; transition: color .2s; }
+.admin-todo input { position: absolute; opacity: 0; pointer-events: none; }
+.admin-todo-box { width: 22px; height: 22px; flex: none; display: grid; place-items: center; border-radius: 7px; background: #efeee8; color: transparent; transition: background .2s, color .2s, transform .2s; }
+.admin-todo label.done { color: #9a929d; text-decoration: line-through; text-decoration-color: #c9c2ca; }
+.admin-todo label.done .admin-todo-box { background: #1f9d5b; color: white; transform: scale(1.06); }
+.admin-todo input:focus-visible + .admin-todo-box { box-shadow: 0 0 0 3px rgba(22,12,25,.18); }
 .admin-kinds { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; }
 .admin-kind { padding: 20px; display: flex; flex-direction: column; gap: 8px; border-radius: 22px; background: white; }
 .admin-kind-icons { display: flex; gap: 6px; margin-bottom: 4px; }
