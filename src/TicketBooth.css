@@ -1,0 +1,98 @@
+.ticket-booth { position: relative; width: min(1120px, 100%); max-height: 92vh; overflow-y: auto; padding: 56px 44px 40px; display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); grid-template-areas: "intro machine" "controls machine"; align-items: start; column-gap: 44px; row-gap: 22px; border-radius: 22px; background: #f3f3ed; box-shadow: 0 30px 90px rgba(0,0,0,.4); }
+.ticket-booth .modal-close { top: 18px; right: 18px; z-index: 3; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 50%; background: rgba(22,12,25,.06); }
+.ticket-intro { grid-area: intro; }
+.ticket-intro h2 { margin: 0 0 12px; font-size: clamp(32px, 4vw, 44px); line-height: 1; letter-spacing: -.05em; font-weight: 500; }
+.ticket-intro > p:not(.kicker) { margin: 0; color: #625a66; font-size: 13px; line-height: 1.6; }
+
+/* The machine prints the ticket out of a slot */
+.ticket-machine { grid-area: machine; position: sticky; top: 0; z-index: 2; padding-top: 4px; background: #f3f3ed; }
+.ticket-slot { position: relative; z-index: 2; height: 46px; margin: 0 -12px; padding: 0 18px 10px; display: flex; align-items: center; gap: 10px; border-radius: 14px; background: linear-gradient(#2c1f31, #160c19); color: rgba(255,255,255,.5); font: 500 9px 'DM Mono', monospace; letter-spacing: .16em; text-transform: uppercase; box-shadow: 0 14px 24px -14px rgba(0,0,0,.6); }
+.ticket-slot::after { content: ''; position: absolute; left: 10px; right: 10px; bottom: 7px; height: 5px; border-radius: 5px; background: #040105; box-shadow: inset 0 2px 3px rgba(0,0,0,.8); }
+.ticket-slot i { width: 7px; height: 7px; border-radius: 50%; background: #ff3b4e; box-shadow: 0 0 10px #ff3b4e; }
+.ticket-feed { position: relative; margin-top: -12px; overflow: hidden; }
+.ticket-print { position: relative; margin-top: 12px; filter: drop-shadow(0 10px 12px rgba(22,12,25,.2)); }
+
+/* The ticket itself, drawn at 1200 × 520 and scaled to fit */
+.ticket { --stub: 300px; position: absolute; left: 0; top: 0; display: flex; overflow: hidden; border-radius: 30px; transform-origin: 0 0; color: white; background: radial-gradient(circle at 78% 0%, color-mix(in srgb, var(--accent) 50%, transparent), transparent 46%), linear-gradient(135deg, #2a1232, #120814 70%); font-family: 'Manrope', Arial, sans-serif; text-align: left;
+  -webkit-mask: radial-gradient(circle at calc(100% - var(--stub)) 0, #0000 27px, #000 28px) top / 100% 51% no-repeat, radial-gradient(circle at calc(100% - var(--stub)) 100%, #0000 27px, #000 28px) bottom / 100% 51% no-repeat;
+  mask: radial-gradient(circle at calc(100% - var(--stub)) 0, #0000 27px, #000 28px) top / 100% 51% no-repeat, radial-gradient(circle at calc(100% - var(--stub)) 100%, #0000 27px, #000 28px) bottom / 100% 51% no-repeat; }
+.ticket-main { position: relative; flex: 1; min-width: 0; padding: 42px 50px 40px; display: flex; flex-direction: column; }
+.ticket header { display: flex; align-items: center; gap: 18px; }
+.ticket .brand-mark { font-size: 36px; letter-spacing: -2.4px; }
+.ticket-museum { padding-left: 18px; border-left: 2px solid color-mix(in srgb, currentColor 25%, transparent); font: 500 13px 'DM Mono', monospace; letter-spacing: .16em; text-transform: uppercase; opacity: .75; }
+.ticket-admit { margin-left: auto; padding: 9px 18px; border-radius: 99px; background: var(--accent); color: white; font: 500 13px 'DM Mono', monospace; letter-spacing: .18em; text-transform: uppercase; }
+.ticket-label { margin: 34px 0 6px; font: 500 13px 'DM Mono', monospace; letter-spacing: .2em; text-transform: uppercase; opacity: .6; }
+.ticket-name { margin: 0; overflow: hidden; font-size: 66px; font-weight: 700; line-height: 1.05; letter-spacing: -.045em; white-space: nowrap; text-overflow: ellipsis; }
+.ticket-name.long { font-size: 50px; }
+.ticket-tour { margin-top: 22px; display: grid; gap: 3px; }
+.ticket-tour small { color: color-mix(in srgb, var(--accent) 70%, white); font: 500 12px 'DM Mono', monospace; letter-spacing: .18em; text-transform: uppercase; }
+.ticket-tour b { font-size: 30px; letter-spacing: -.03em; }
+.ticket-tour span { font-size: 15px; opacity: .7; }
+.ticket-route { margin: auto 0 0; padding: 0; display: flex; gap: 20px; list-style: none; }
+.ticket-route li { position: relative; width: 46px; height: 46px; display: grid; place-items: center; border-radius: 50%; background: color-mix(in srgb, var(--accent) 22%, transparent); color: color-mix(in srgb, var(--accent) 60%, white); }
+.ticket-route li + li::before { content: ''; position: absolute; right: 100%; top: 50%; width: 20px; height: 2px; background: color-mix(in srgb, var(--accent) 45%, transparent); }
+.ticket-route svg { width: 28px; height: 28px; stroke-width: 3.6; }
+.ticket-route i { width: 18px; height: 18px; border-radius: 50%; background: var(--accent); }
+.ticket-facts { margin: 22px 0 0; display: grid; grid-template-columns: repeat(4, auto); justify-content: start; column-gap: 40px; }
+.ticket-facts dt { font: 500 11px 'DM Mono', monospace; letter-spacing: .16em; text-transform: uppercase; opacity: .55; }
+.ticket-facts dd { margin: 4px 0 0; font-size: 18px; font-weight: 700; letter-spacing: -.01em; }
+.ticket-stub { position: relative; width: var(--stub); padding: 42px 36px 36px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; background: linear-gradient(color-mix(in srgb, currentColor 35%, transparent) 50%, transparent 50%) 0 0 / 3px 18px repeat-y; }
+.ticket-stub::before { content: ''; position: absolute; inset: 0 0 0 3px; background: rgba(255,255,255,.05); }
+.ticket-stub > * { position: relative; }
+.ticket-stub-admit { font: 500 14px 'DM Mono', monospace; letter-spacing: .3em; text-transform: uppercase; opacity: .7; }
+.ticket-x { position: relative; width: 120px; height: 140px; }
+.ticket-x i { position: absolute; left: 50%; top: 50%; width: 30px; height: 150px; margin: -75px 0 0 -15px; background: linear-gradient(180deg, #ef1721 5%, #cf145b 47%, #9619df 95%); transform: rotate(-37deg); box-shadow: 0 0 40px rgba(194,20,113,.3); }
+.ticket-x i:last-child { background: linear-gradient(180deg, #e21c2c 5%, #c5136e 45%, #6f2b91 95%); transform: rotate(37deg); }
+.ticket-barcode { width: 100%; height: 64px; fill: currentColor; opacity: .85; }
+.ticket-stub small { font: 500 13px 'DM Mono', monospace; letter-spacing: .14em; opacity: .7; }
+
+.ticket-paper { color: #2b1b22; background: repeating-linear-gradient(0deg, rgba(90,60,40,.035) 0 2px, transparent 2px 6px), radial-gradient(circle at 80% 0%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 50%), #f5edde; }
+.ticket-paper .ticket-tour small { color: var(--accent); }
+.ticket-paper .ticket-route li { color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); }
+.ticket-paper .ticket-stub::before { background: rgba(90,60,40,.04); }
+.ticket-paper .ticket-stub-admit { padding: 6px 12px; border-radius: 6px; background: #b3242f; color: #f5edde; opacity: 1; transform: rotate(-6deg); }
+.ticket-holo { color: #1d1022; background: linear-gradient(115deg, #ffd6ea, #dfe2ff 28%, #cff8ee 52%, #fff0c4 76%, #ffd6ea); }
+.ticket-holo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,.65) 45%, transparent 60%); mix-blend-mode: soft-light; pointer-events: none; }
+.ticket-holo .ticket-tour small { color: color-mix(in srgb, var(--accent) 80%, #1d1022); }
+.ticket-holo .ticket-route li { color: color-mix(in srgb, var(--accent) 85%, #1d1022); background: rgba(255,255,255,.55); }
+
+/* Controls */
+.ticket-controls { grid-area: controls; display: grid; gap: 12px; }
+.ticket-controls .share-label { margin-top: 6px; }
+.ticket-tours { display: flex; flex-wrap: wrap; gap: 8px; }
+.ticket-tours button, .ticket-styles button { min-height: 40px; padding: 0 14px; display: inline-flex; align-items: center; gap: 8px; border: 0; border-radius: 99px; background: white; color: var(--ink); font-size: 13px; font-weight: 600; box-shadow: 0 1px 0 rgba(22,12,25,.08), 0 4px 12px -8px rgba(22,12,25,.3); transition: background .2s, color .2s, transform .2s; }
+.ticket-tours button:active, .ticket-styles button:active { transform: scale(.96); }
+.ticket-tours i { width: 10px; height: 10px; border-radius: 50%; }
+.ticket-tours button.active, .ticket-styles button.active { background: var(--ink); color: white; }
+.ticket-styles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.ticket-styles button { min-height: 0; padding: 8px; flex-direction: column; border-radius: 14px; font-size: 12px; }
+.ticket-styles i { width: 100%; height: 30px; border-radius: 9px; }
+.ticket-style-midnight i { background: linear-gradient(135deg, #2a1232, #120814); }
+.ticket-style-paper i { background: #f5edde; box-shadow: inset 0 0 0 1px rgba(43,27,34,.12); }
+.ticket-style-holo i { background: linear-gradient(115deg, #ffd6ea, #dfe2ff, #cff8ee, #fff0c4); }
+.ticket-controls .share-actions { margin-top: 8px; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .ticket-booth { animation: pop-in .45s cubic-bezier(.2,.8,.2,1) both; }
+  .ticket-print { animation: ticket-print 1.6s cubic-bezier(.3,.6,.3,1) .15s both; }
+  .ticket-slot i { animation: ticket-led .5s steps(2) 4 .15s; }
+}
+@keyframes ticket-print { 0% { transform: translateY(-104%); } 22% { transform: translateY(-76%); } 30% { transform: translateY(-74%); } 52% { transform: translateY(-42%); } 60% { transform: translateY(-40%); } 100% { transform: none; } }
+@keyframes ticket-led { 50% { opacity: .2; } }
+
+@media (max-width: 760px) {
+  .ticket-booth { grid-template-columns: minmax(0, 1fr); grid-template-areas: "intro" "machine" "controls"; row-gap: 18px; padding: 40px 24px 28px; }
+  .ticket-machine { top: -40px; margin: 0 -24px; padding: 12px 24px 4px; }
+}
+@media (max-width: 600px) {
+  .ticket-booth { width: 100%; max-height: 94svh; padding: 34px 20px calc(24px + env(safe-area-inset-bottom)); border-radius: 24px 24px 0 0; }
+  .ticket-booth::before { content: ''; position: absolute; top: 10px; left: 50%; width: 40px; height: 4px; margin-left: -20px; border-radius: 4px; background: rgba(22,12,25,.18); }
+  .ticket-intro h2 { padding-right: 40px; font-size: 30px; }
+  .ticket-intro > p:not(.kicker) { display: none; }
+  .ticket-machine { top: -34px; margin: 0 -20px; padding: 10px 20px 4px; }
+  .ticket-tours { flex-wrap: nowrap; margin: 0 -20px; padding: 2px 20px 6px; overflow-x: auto; scrollbar-width: none; }
+  .ticket-tours button { flex: none; }
+}
+@media (max-width: 600px) and (prefers-reduced-motion: no-preference) {
+  .ticket-booth { animation: sheet-up .5s cubic-bezier(.2,.8,.2,1) both; }
+}

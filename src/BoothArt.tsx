@@ -1,0 +1,52 @@
+// Line illustrations for each booth, drawn on a 64 × 64 grid in the current colour.
+const art: Record<string, string> = {
+  sns: '<circle cx="14" cy="18" r="6"/><circle cx="50" cy="18" r="6"/><circle cx="32" cy="48" r="6"/><path d="M20 18h24M17 23l12 20M47 23 35 43"/>',
+  'engineering-collaboration-tools': '<rect x="8" y="20" width="36" height="24" rx="3"/><path d="M4 50h44"/><path d="M38 8h20v14H48l-6 5v-5h-4z"/>',
+  'digital-strategy': '<circle cx="28" cy="36" r="20"/><circle cx="28" cy="36" r="10"/><path d="M28 36 54 10M45 10h9v9"/>',
+  'technology-strategy': '<path d="M8 54c12 0 10-16 22-16s12-16 22-16"/><circle cx="8" cy="54" r="3"/><circle cx="30" cy="38" r="3"/><path d="M52 24V6h-11l3 5-3 5h11"/>',
+  'emerging-technology': '<ellipse cx="32" cy="32" rx="26" ry="9"/><ellipse cx="32" cy="32" rx="26" ry="9" transform="rotate(60 32 32)"/><ellipse cx="32" cy="32" rx="26" ry="9" transform="rotate(-60 32 32)"/><circle cx="32" cy="32" r="3"/>',
+  'cloud-contact-centres': '<path d="M18 32h28a8 8 0 0 0 0-16 12 12 0 0 0-23-3 9 9 0 0 0-5 19z"/><path d="M20 56v-6a12 12 0 0 1 24 0v6"/><rect x="16" y="50" width="6" height="9" rx="2"/><rect x="42" y="50" width="6" height="9" rx="2"/>',
+  'ecm-customer': '<rect x="12" y="8" width="28" height="36" rx="3"/><rect x="22" y="18" width="30" height="38" rx="3"/><path d="M29 30h16M29 37h16M29 44h10"/>',
+  'book-a-banker': '<rect x="10" y="14" width="44" height="40" rx="4"/><path d="M10 25h44M21 8v11M43 8v11M24 40l6 6 11-11"/>',
+  'loan-builder': '<path d="M8 30 32 10l24 20"/><path d="M15 25v29h34V25"/><rect x="27" y="38" width="10" height="16"/>',
+  'merchant-banking': '<rect x="18" y="6" width="28" height="52" rx="5"/><rect x="23" y="12" width="18" height="12" rx="2"/><path d="M24 33h3M31 33h3M38 33h3M24 41h3M31 41h3M38 41h3M24 49h17"/>',
+  'westpac-one': '<rect x="10" y="10" width="44" height="44" rx="13"/><path d="M27 23l7-4v27M25 46h17"/>',
+  'everyday-banking': '<rect x="18" y="6" width="28" height="52" rx="6"/><circle cx="32" cy="29" r="8"/><path d="M32 25v8M29 51h6"/>',
+  'ecm-perform': '<path d="M8 46a24 24 0 0 1 48 0"/><path d="M32 46 45 28"/><circle cx="32" cy="46" r="3"/><path d="M13 46h4M47 46h4M32 22v4M17 30l3 3M47 30l-3 3"/>',
+  'employee-benefits': '<path d="M32 54S8 40 8 24a12 12 0 0 1 24-3 12 12 0 0 1 24 3c0 16-24 30-24 30z"/><path d="M32 25v13M25.5 31.5h13"/>',
+  'ethan-indigenous': '<circle cx="32" cy="34" r="11"/><circle cx="32" cy="10" r="5"/><circle cx="12" cy="46" r="5"/><circle cx="52" cy="46" r="5"/><path d="M32 15v8M16 43l7-4M48 43l-7-4"/>',
+  'tour-de-cure': '<circle cx="14" cy="42" r="10"/><circle cx="50" cy="42" r="10"/><path d="M14 42l10-18h16l10 18M24 24l9 18 7-18M20 17h9M40 24l-2-7h6"/>',
+  'cyber-mate': '<rect x="14" y="18" width="36" height="28" rx="9"/><circle cx="25" cy="32" r="3"/><circle cx="39" cy="32" r="3"/><path d="M32 18v-8M27 10h10M26 46v8M38 46v8M20 54h24"/>',
+  'asset-management': '<path d="M30 12a22 22 0 1 0 22 22H30z"/><path d="M36 6a22 22 0 0 1 22 22H36z"/>',
+  bcm: '<path d="M50 24a20 20 0 1 0 2 16"/><path d="M54 10v14H40"/><path d="M32 22v11l7 5"/>',
+  testing: '<path d="M23 8h18M27 8v17L11 51a4 4 0 0 0 3 6h36a4 4 0 0 0 3-6L37 25V8"/><path d="M24 44l5 5 11-11"/>',
+  'family-feud': '<path d="M14 44a18 18 0 0 1 36 0z"/><rect x="9" y="44" width="46" height="9" rx="2"/><path d="M32 17V7M19 21l-6-6M45 21l6-6"/>',
+  cyber: '<path d="M32 6 52 14v17c0 12-9 21-20 26-11-5-20-14-20-26V14z"/><rect x="24" y="29" width="16" height="13" rx="2"/><path d="M27 29v-4a5 5 0 0 1 10 0v4"/>',
+  udemy: '<rect x="8" y="10" width="48" height="36" rx="5"/><path d="M28 21v14l12-7z"/><path d="M22 55h20M32 46v9"/>',
+  'linkedin-learning': '<path d="M32 18c-6-5-14-6-23-5v35c9-1 17 0 23 5 6-5 14-6 23-5V13c-9-1-17 0-23 5zM32 18v35"/>',
+  'people-tools': '<rect x="8" y="22" width="48" height="32" rx="4"/><path d="M24 22v-7h16v7M8 36h48M28 36v6h8v-6"/>',
+  'motivate-plus': '<path d="M32 7l7.5 15.5 17 2.3-12.4 11.8 3 16.9L32 45.4l-15.1 8.1 3-16.9L7.5 24.8l17-2.3z"/>',
+  'emerging-talent': '<path d="M32 58V28"/><path d="M32 36c0-13-8-20-22-20 0 13 8 20 22 20zM32 29c0-11 7-18 21-18 0 11-7 18-21 18z"/>',
+  'head-shot-photo-booth': '<rect x="7" y="18" width="50" height="36" rx="5"/><path d="M21 18l5-8h12l5 8"/><circle cx="32" cy="36" r="11"/><circle cx="48" cy="27" r="1.5"/>',
+  'women-in-technology': '<circle cx="28" cy="20" r="9"/><path d="M10 56a18 18 0 0 1 36 0"/><path d="M51 8l2.5 5.5L59 16l-5.5 2.5L51 24l-2.5-5.5L43 16l5.5-2.5z"/>',
+  'dei-rising-women': '<circle cx="24" cy="25" r="14"/><circle cx="40" cy="25" r="14"/><circle cx="32" cy="40" r="14"/>',
+  'engineering-practice': '<circle cx="32" cy="32" r="8"/><circle cx="32" cy="32" r="18"/><path d="M32 6v8M32 50v8M6 32h8M50 32h8M13.6 13.6l5.6 5.6M44.8 44.8l5.6 5.6M13.6 50.4l5.6-5.6M44.8 19.2l5.6-5.6"/>',
+  'architecture-practice': '<path d="M32 6 55 19v26L32 58 9 45V19z"/><path d="M9 19l23 13 23-13M32 32v26"/>',
+  'design-practice': '<path d="M32 6 48 30 32 58 16 30z"/><circle cx="32" cy="34" r="4"/><path d="M32 6v24"/>',
+  'data-ai-practice': '<path d="M12 54V38M24 54V28M36 54V34M48 54V22M6 58h52"/><path d="M38 6l2.5 5.5L46 14l-5.5 2.5L38 22l-2.5-5.5L30 14l5.5-2.5z"/>',
+  'product-ownership-practice': '<path d="M23 40c-5-4-9-9-9-16a18 18 0 0 1 36 0c0 7-4 12-9 16v7H23z"/><path d="M25 54h14M28 47v-7M36 47v-7"/>',
+  'delivery-practice': '<rect x="7" y="10" width="50" height="44" rx="4"/><path d="M24 10v44M41 10v44"/><rect x="11" y="17" width="9" height="7" rx="1.5"/><rect x="11" y="29" width="9" height="7" rx="1.5"/><rect x="28" y="17" width="9" height="7" rx="1.5"/><rect x="45" y="17" width="9" height="7" rx="1.5"/>',
+  'service-operations': '<rect x="7" y="9" width="50" height="36" rx="4"/><path d="M13 28h9l4-9 6 17 4-8h15M24 55h16M32 45v10"/>',
+  'ai-sdlc': '<path d="M52 32a20 20 0 1 1-6-14"/><path d="M48 8v10H38"/><path d="M32 22l2.5 7.5L42 32l-7.5 2.5L32 42l-2.5-7.5L22 32l7.5-2.5z"/>',
+  wdlc: '<rect x="5" y="24" width="14" height="16" rx="3"/><rect x="25" y="24" width="14" height="16" rx="3"/><rect x="45" y="24" width="14" height="16" rx="3"/><path d="M19 32h6M39 32h6M12 24V14h40v10"/>',
+  'snowflake-adapt': '<path d="M32 6v52M9.5 19l45 26M9.5 45l45-26"/><path d="M26 10l6 6 6-6M26 54l6-6 6 6M10 26l8-2-2-8M54 38l-8 2 2 8M10 38l8 2-2 8M54 26l-8-2 2-8"/>',
+  github: '<circle cx="18" cy="12" r="5"/><circle cx="18" cy="52" r="5"/><circle cx="46" cy="22" r="5"/><path d="M18 17v30M46 27c0 12-28 9-28 20"/>',
+  'jira-confluence': '<rect x="12" y="7" width="40" height="50" rx="5"/><path d="M19 22l4 4 8-8M19 40l4 4 8-8M36 23h9M36 41h9"/>',
+}
+
+// pathLength lets every stroke draw in with the same CSS animation.
+const markup = Object.fromEntries(Object.entries(art).map(([id, svg]) => [id, svg.replace(/<(path|circle|rect|ellipse)/g, '<$1 pathLength="1"')]))
+
+export function BoothArt({ id, className = '' }: { id: string; className?: string }) {
+  return <svg className={`booth-art ${className}`} viewBox="0 0 64 64" aria-hidden="true" dangerouslySetInnerHTML={{ __html: markup[id] }} />
+}

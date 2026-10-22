@@ -1,0 +1,106 @@
+/* Wing badges */
+.wing-badge { position: relative; display: block; width: 64px; aspect-ratio: 100 / 112; color: var(--accent); }
+.wing-badge > svg:first-child { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.wing-badge-icon { position: absolute; left: 50%; top: 41%; width: 36%; height: auto; translate: -50% -50%; opacity: .6; }
+.wing-badge.earned .wing-badge-icon { color: white; opacity: 1; }
+
+/* Passport: wing badges replace the round stamps */
+.stamp-grid .stamp-badge { min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 5px; text-align: center; }
+.stamp-badge .wing-badge { width: min(100%, 62px); }
+.stamp-badge small { max-width: 100%; color: rgba(255,255,255,.55); font: 500 7px/1.3 'DM Mono', monospace; letter-spacing: .08em; text-transform: uppercase; }
+.stamp-badge.earned small { color: white; }
+.stamp-badge span:last-child { color: rgba(255,255,255,.4); font: 500 9px 'DM Mono', monospace; }
+.stamp-badge.earned span:last-child { color: var(--accent); }
+
+/* Celebration: the badge spins in like a medal being pinned on */
+.celebration-medal { width: 100%; margin-top: 18px; padding: 14px; display: flex; align-items: center; gap: 14px; border-radius: 18px; background: color-mix(in srgb, var(--accent) 10%, white); text-align: left; }
+.celebration-medal .wing-badge { flex: none; width: 66px; }
+.celebration-medal > span:last-child { display: flex; flex-direction: column; gap: 3px; font-size: 17px; font-weight: 700; letter-spacing: -.02em; }
+.celebration-medal small { color: #6f6873; font: 500 9px 'DM Mono', monospace; letter-spacing: .12em; text-transform: uppercase; }
+.celebration-medal em { color: #6f6873; font-size: 11px; font-style: normal; font-weight: 500; letter-spacing: 0; }
+
+/* Share card: completed wings show their badge */
+.share-wings .share-badge { width: 72px; height: 80px; }
+.share-wings small { text-align: center; }
+
+/* Hidden exhibit reveal */
+.secret-reveal { width: 100%; height: 100%; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; overflow: hidden auto; background: radial-gradient(ellipse at 50% 0%, #2c1238 0, #0c0610 62%); color: white; }
+.secret-reveal[open] { display: grid; place-items: center; }
+.secret-reveal:focus { outline: none; }
+.secret-reveal::backdrop { background: #0c0610; }
+.secret-beam { position: fixed; left: 50%; top: -6%; width: min(150vw, 1000px); height: 96%; translate: -50% 0; background: conic-gradient(from 158deg at 50% 0%, transparent 0deg, rgba(255,226,184,.26) 22deg, transparent 44deg); filter: blur(8px); pointer-events: none; }
+.secret-dust { position: fixed; inset: 0; pointer-events: none; }
+.secret-dust i { position: absolute; left: var(--x); bottom: 10%; width: 3px; height: 3px; border-radius: 50%; background: #ffe2b8; opacity: 0; }
+.secret-stage { position: relative; z-index: 1; width: min(440px, 100%); padding: 40px 24px calc(30px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; align-items: center; text-align: center; }
+.secret-stage .kicker { margin: 0 0 8px; color: #ffcf94; }
+.secret-case { position: relative; width: 200px; height: 220px; margin: 0 0 22px; }
+.secret-case .secret-art { position: absolute; z-index: 1; left: 50%; top: 26px; width: 108px; height: 108px; margin-left: -54px; color: #ffd9a6; stroke-width: 2.2; filter: drop-shadow(0 0 16px rgba(255,190,120,.6)); }
+.secret-glass { position: absolute; inset: 0 16px 40px; border-radius: 8px 8px 0 0; background: linear-gradient(115deg, rgba(255,255,255,.12), rgba(255,255,255,.03) 38%, rgba(255,255,255,.09) 58%, rgba(255,255,255,.02)); box-shadow: inset 0 0 0 1px rgba(255,255,255,.14); }
+.secret-plinth { position: absolute; left: 0; right: 0; bottom: 0; height: 40px; border-radius: 4px; background: linear-gradient(#3b2244, #1b0e20); box-shadow: 0 24px 40px rgba(0,0,0,.6), inset 0 1px rgba(255,255,255,.18); }
+.secret-plinth::before { content: ''; position: absolute; left: 50%; top: -9px; width: 120px; height: 18px; margin-left: -60px; border-radius: 50%; background: radial-gradient(rgba(255,214,160,.4), transparent 70%); }
+.secret-stage h2 { margin: 0; font-size: clamp(28px, 7vw, 36px); line-height: 1.05; letter-spacing: -.04em; }
+.secret-era { margin: 8px 0 0; color: #ffcf94; font: 500 11px 'DM Mono', monospace; letter-spacing: .14em; text-transform: uppercase; }
+.secret-fact { margin: 16px 0 0; color: rgba(255,255,255,.78); font-size: 15px; line-height: 1.6; }
+.secret-points { margin: 18px 0 0; padding: 8px 16px; border-radius: 99px; background: linear-gradient(100deg, #ef1721, #c31672 55%, #9619df); font: 600 12px 'DM Mono', monospace; letter-spacing: .06em; }
+.secret-stage .button { width: 100%; min-height: 52px; margin-top: 26px; border-radius: 14px; font-size: 14px; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .secret-beam { animation: spot-on 1.2s linear both; }
+  .secret-dust i { animation: secret-dust 5s ease-in var(--t) infinite; }
+  .secret-case .secret-art { animation: secret-rise 1.5s cubic-bezier(.2,.8,.2,1) .5s both, secret-float 4s ease-in-out 2s infinite; }
+  .secret-case .secret-art.draw > * { animation-delay: .7s; animation-duration: 1.6s; }
+  .secret-glass { animation: secret-glass 1s cubic-bezier(.2,.8,.2,1) 1.4s both; }
+  .secret-plinth { animation: hero-enter .7s ease-out .2s both; }
+  .secret-stage h2, .secret-era { animation: hero-enter .6s ease-out 1.3s both; }
+  .secret-fact { animation: hero-enter .6s ease-out 1.6s both; }
+  .secret-points { animation: challenge-pop .5s cubic-bezier(.2,.8,.2,1.4) 1.9s both; }
+  .secret-stage .button { animation: hero-enter .6s ease-out 2.1s both; }
+}
+@keyframes secret-rise { from { opacity: 0; translate: 0 70px; scale: .6; } }
+@keyframes secret-float { 0%, 100% { translate: 0 0; } 50% { translate: 0 -10px; } }
+@keyframes secret-glass { from { opacity: 0; translate: 0 -60px; } }
+@keyframes secret-dust { 0% { opacity: 0; transform: translateY(0); } 20% { opacity: .8; } 100% { opacity: 0; transform: translateY(-60vh) translateX(20px); } }
+
+/* Passport shelf of hidden exhibits */
+.secret-shelf { margin-top: 20px; padding-top: 18px; border-top: 1px solid #ffffff26; }
+.secret-shelf-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.secret-shelf-head small { color: #ffffffa6; font: 500 8px 'DM Mono', monospace; letter-spacing: .13em; text-transform: uppercase; }
+.secret-shelf-head b { color: #ffcf94; font: 500 11px 'DM Mono', monospace; }
+.secret-shelf ul { max-width: 360px; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; list-style: none; }
+.secret-shelf li { position: relative; aspect-ratio: 1; display: grid; place-items: center; border-radius: 14px; background: rgba(255,255,255,.05); color: rgba(255,255,255,.3); outline: none; }
+.secret-shelf li > svg { width: 40%; height: auto; }
+.secret-shelf li.found { background: radial-gradient(circle at 50% 35%, rgba(255,207,148,.28), rgba(255,207,148,.06) 70%); color: #ffd9a6; }
+.secret-shelf li.found > svg { width: 62%; stroke-width: 3; }
+.secret-tip { position: absolute; z-index: 3; bottom: calc(100% + 8px); left: 50%; width: max-content; max-width: 170px; padding: 8px 10px; border-radius: 10px; background: white; color: var(--ink); font-size: 11px; font-weight: 600; line-height: 1.35; text-align: center; box-shadow: 0 10px 24px rgba(0,0,0,.3); opacity: 0; translate: -50% 4px; pointer-events: none; transition: opacity .2s, translate .2s; }
+.secret-shelf li:first-child .secret-tip { left: 0; translate: 0 4px; }
+.secret-shelf li:last-child .secret-tip { left: auto; right: 0; translate: 0 4px; }
+.secret-shelf li:hover .secret-tip, .secret-shelf li:focus-visible .secret-tip, .secret-shelf li:focus .secret-tip { opacity: 1; translate: -50% 0; }
+.secret-shelf li:first-child:is(:hover, :focus) .secret-tip, .secret-shelf li:last-child:is(:hover, :focus) .secret-tip { translate: 0 0; }
+.secret-shelf > p { margin: 10px 0 0; color: #ffffff80; font-size: 10px; line-height: 1.5; }
+
+/* Easter egg: the foyer X spins when tapped five times */
+.hero-installation { pointer-events: none; }
+/* Let taps on the hero's empty space reach the X behind it. */
+.hero-copy { pointer-events: none; }
+.hero-copy > * { pointer-events: auto; }
+.foyer-x { pointer-events: auto; cursor: pointer; transition: transform .45s cubic-bezier(.2,.8,.2,1.5); -webkit-tap-highlight-color: transparent; }
+.foyer-x.spin { transition: transform 1.6s cubic-bezier(.2,.75,.15,1); }
+.foyer-burst { position: absolute; left: 50%; top: 32%; pointer-events: none; }
+.foyer-burst i { position: absolute; width: 10px; height: 10px; margin: -5px; border-radius: 50%; background: var(--c); opacity: 0; animation: foyer-burst 1.3s cubic-bezier(.15,.7,.3,1) var(--t) both; }
+.foyer-burst i:nth-child(3n) { border-radius: 2px; width: 7px; height: 14px; }
+@keyframes foyer-burst { 0% { opacity: 1; transform: rotate(var(--a)) translateY(0) scale(.4); } 80% { opacity: 1; } 100% { opacity: 0; transform: rotate(var(--a)) translateY(calc(var(--d) * -1)) scale(1); } }
+
+@media (prefers-reduced-motion: no-preference) {
+  .celebration-medal { animation: hero-enter .5s ease-out .6s both; }
+  .celebration-medal .wing-badge { animation: medal-pin 1.2s cubic-bezier(.2,.8,.2,1.15) .75s both; }
+}
+@keyframes medal-pin { from { opacity: 0; transform: perspective(500px) rotateY(-360deg) scale(.3); } }
+
+/* Hidden exhibit poster */
+.qr-poster-secret .qr-poster-icon { display: grid; place-items: center; color: var(--accent); }
+.qr-poster-secret .qr-poster-icon svg { width: 34px; height: 34px; }
+
+/* Admin list of hidden exhibits */
+.admin-subhead { margin: 44px 0 6px; font-size: 24px; letter-spacing: -.03em; }
+.admin-note { margin: 0; color: #6f6873; font-size: 13px; line-height: 1.6; }
+.admin-table .secret-art { stroke-width: 3; }
