@@ -27,6 +27,8 @@ jobs:
         with:
           node-version: 24
           cache: npm
+      # Local installs may record Westpac's internal registry, which GitHub can't reach; use the public one.
+      - run: sed -i 's#https://artifactory.srv.westpac.com.au/artifactory/api/npm/wdp-001_npm_virtual/#https://registry.npmjs.org/#g' package-lock.json
       - run: npm ci
       # Pages serves the site from /<repo name>/.
       - run: npm run build -- --base=/${{ github.event.repository.name }}/
