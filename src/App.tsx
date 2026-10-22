@@ -239,9 +239,9 @@ function App() {
     }, { rootMargin: '-45% 0px -50% 0px' })
     document.querySelectorAll('main > section').forEach((section) => observer.observe(section))
     return () => observer.disconnect()
-  }, [])
+  }, [lockdown])
 
-  // Reveal content as it scrolls into view.
+  // Reveal content as it scrolls into view, including sections that appear when lockdown ends.
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
       for (const entry of entries) {
@@ -250,9 +250,9 @@ function App() {
         observer.unobserve(entry.target)
       }
     }, { rootMargin: '0px 0px -8% 0px' })
-    document.querySelectorAll('[data-reveal]').forEach((element) => observer.observe(element))
+    document.querySelectorAll('[data-reveal]:not(.in-view)').forEach((element) => observer.observe(element))
     return () => observer.disconnect()
-  }, [])
+  }, [lockdown])
 
   const visibleExhibits = useMemo(() => {
     const terms = query.trim().toLowerCase().split(/\s+/).filter(Boolean)
