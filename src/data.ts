@@ -155,11 +155,11 @@ export type Session = { start: string; end?: string; title: string; detail: stri
 export const schedule: Session[] = [
   { start: '09:30', title: 'Doors open', detail: 'Pick up your showbag and get your passport ready.', place: 'Showbag Pick-Up, Kogarah Front', kind: 'Arrival' },
   { start: '10:00', end: '10:30', title: 'Welcome to TECHx26', detail: 'Opening remarks to launch the Museum of Technology.', place: 'Auditorium', kind: 'Keynote' },
-  { start: '10:30', end: '15:30', title: 'The museum is open', detail: `All ${exhibits.length} booths across Kogarah Front and Back.`, place: 'Kogarah Front & Back', kind: 'All day' },
-  { start: '10:30', end: '15:30', title: 'Rapid photo booth', detail: 'Refresh your profile photo while you explore.', place: 'Booth 29, Kogarah Back', kind: 'Activity', exhibit: 'head-shot-photo-booth' },
+  { start: '10:30', end: '17:00', title: 'The museum is open', detail: `All ${exhibits.length} booths across Kogarah Front and Back.`, place: 'Kogarah Front & Back', kind: 'All day' },
+  { start: '10:30', end: '17:00', title: 'Rapid photo booth', detail: 'Refresh your profile photo while you explore.', place: 'Booth 29, Kogarah Back', kind: 'Activity', exhibit: 'head-shot-photo-booth' },
   { start: '12:00', end: '13:00', title: 'Lunch', detail: 'Refuel and swap notes on your favourite booths.', place: 'Kitchen, Kogarah Back', kind: 'Break' },
   { start: '14:00', end: '15:00', title: 'Family Feud: GMs vs Grads', detail: 'Come and cheer them on.', place: 'Auditorium', kind: 'Activity', exhibit: 'family-feud' },
-  { start: '15:30', title: 'Museum closes', detail: 'Last chance to collect your stamps and download your explorer card.', place: 'Kogarah Front & Back', kind: 'Wrap-up' },
+  { start: '17:00', title: 'Museum closes', detail: 'Last chance to collect your stamps and download your explorer card.', place: 'Kogarah Front & Back', kind: 'Wrap-up' },
 ]
 
 export const boothNumber = (exhibit: Exhibit) => String(exhibit.booth).padStart(2, '0')
