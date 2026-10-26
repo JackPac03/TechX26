@@ -72,7 +72,7 @@ function EntranceCheck({ status, busy, ip, tries, onRecheck }: { status: Exclude
               <h2>Entrance criteria</h2>
               <ol className="entrance-criteria">
                 <li><b>Join Westpac Wi-Fi.</b> Pick <code>Westpac_Free_WiFi</code>, or <code>mobile@wsmart</code> on a work phone.</li>
-                <li><b>Turn off mobile data</b> so your phone doesn’t sneak out on 4G.</li>
+                <li><b>Turn off mobile data</b> so your phone doesn’t sneak out on 4G. Or turn off <span className="entrance-path">Wi-Fi Assist</span> at the bottom of Settings › Mobile.</li>
                 <li><b>Turn off Private Relay or any VPN.</b> On iPhone: <span className="entrance-path">Settings › Wi-Fi › ⓘ</span> › Limit IP Address Tracking.</li>
               </ol>
               {tries > 0 && !busy && <p className="entrance-still" role="status">Still not on the list. Give the Wi-Fi a few seconds to connect, then try again.</p>}

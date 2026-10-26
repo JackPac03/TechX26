@@ -3,19 +3,33 @@
 const trusted = __TRUSTED_NETWORKS__
 export const networkCheckEnabled = trusted !== null
 
-// Cloudflare echoes back the address a request came from. 1.1.1.1 always answers over IPv4.
-const traceUrls = ['https://1.1.1.1/cdn-cgi/trace', 'https://www.cloudflare.com/cdn-cgi/trace']
+// Cloudflare echoes back the address a request came from. Phones keep an open connection on the
+// network they started on, so after joining Wi-Fi the same address would still answer over mobile data.
+// Each check starts with a different address from the last one, which needs a fresh connection.
+const traceHosts = ['1.1.1.1', '1.0.0.1', 'cloudflare.com', 'www.cloudflare.com']
+const isIPv4 = (ip: string) => /^\d{1,3}(\.\d{1,3}){3}$/.test(ip)
+let nextHost = 0
 const publicAddress = async () => {
-  for (const url of traceUrls) {
+  let fallback: string | null = null
+  const start = nextHost
+  nextHost = (start + 1) % traceHosts.length
+  for (let step = 0; step < traceHosts.length; step++) {
+    const index = (start + step) % traceHosts.length
     try {
-      const response = await fetch(url, { cache: 'no-store' })
+      const response = await fetch(`https://${traceHosts[index]}/cdn-cgi/trace`, { cache: 'no-store' })
       const ip = (await response.text()).match(/^ip=(.+)$/m)?.[1]
-      if (ip) return ip
+      if (!ip) continue
+      // The named hosts can answer over IPv6, which can't be matched, so try the next one for an IPv4 address.
+      if (isIPv4(ip)) {
+        nextHost = (index + 1) % traceHosts.length
+        return ip
+      }
+      fallback ??= ip
     } catch {
       // Try the next one.
     }
   }
-  return null
+  return fallback
 }
 
 const fingerprint = async (text: string) => {
@@ -29,7 +43,7 @@ export const checkNetwork = async (): Promise<{ ip: string | null; trusted: bool
   const ip = await publicAddress()
   if (!ip) return { ip, trusted: null }
   const parts = ip.split('.').map(Number)
-  if (parts.length !== 4 || parts.some((part) => !Number.isInteger(part) || part < 0 || part > 255)) return { ip, trusted: false }
+  if (!isIPv4(ip) || parts.some((part) => part > 255)) return { ip, trusted: false }
   const value = parts.reduce((total, part) => total * 256 + part, 0)
   for (const length of trusted!.lengths) {
     const network = Math.floor(value / 2 ** (32 - length)) * 2 ** (32 - length)
