@@ -248,8 +248,18 @@ function App() {
     queueProgress({ nickname: player.nickname, code: playerCode(player.id), stamps: visited, secrets: found, results, explorer_type: explorerType?.id ?? null })
   }, [visited, found, results, explorerType, lockdown])
 
+  // The scan button tucks away while scrolling down the page, so it doesn't cover what's being read,
+  // and comes back on any scroll up.
+  const [fabTucked, setFabTucked] = useState(false)
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24)
+    let lastY = window.scrollY
+    const onScroll = () => {
+      const y = window.scrollY
+      setScrolled(y > 24)
+      if (Math.abs(y - lastY) < 8) return
+      setFabTucked(y > lastY && y > 300)
+      lastY = y
+    }
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
@@ -813,7 +823,7 @@ function App() {
         <p className="footer-credit">Created by Jack Hodges – 2026 Technology Graduate</p>
       </footer>
 
-      {!lockdown && <button className="scan-fab" onClick={() => setScanOpen(true)} aria-label="Scan exhibit QR"><QrCode size={18} /><span>Scan exhibit</span></button>}
+      {!lockdown && <button className={fabTucked ? 'scan-fab tucked' : 'scan-fab'} onClick={() => setScanOpen(true)} aria-label="Scan exhibit QR"><QrCode size={18} /><span>Scan exhibit</span></button>}
 
       {surpriseRoll && (
         <div className="modal-backdrop" role="presentation" onMouseDown={cancelSurprise}>

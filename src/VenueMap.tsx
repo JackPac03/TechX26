@@ -185,10 +185,21 @@ export function VenueMap({ visited, saved, onOpen, compact, focus, route, routeC
     })
   }
 
-  // Start narrow, scrollable maps at Back's top-left, without claiming a location.
+  // Start narrow, scrollable maps at Back's top-left, without claiming a location. Safari can lay the
+  // page out wider first, so apply it again whenever the map changes size, until the visitor moves it.
   useEffect(() => {
     const viewport = viewportRef.current
-    if (viewport && !compact) viewport.scrollLeft = viewport.scrollWidth * back.x / viewBox.w
+    if (!viewport || compact) return
+    const observer = new ResizeObserver(() => requestAnimationFrame(() => { viewport.scrollLeft = viewport.scrollWidth * back.x / viewBox.w }))
+    observer.observe(viewport)
+    const stop = () => observer.disconnect()
+    viewport.addEventListener('pointerdown', stop, { once: true })
+    viewport.addEventListener('wheel', stop, { once: true, passive: true })
+    return () => {
+      observer.disconnect()
+      viewport.removeEventListener('pointerdown', stop)
+      viewport.removeEventListener('wheel', stop)
+    }
   }, [compact])
 
   return (
