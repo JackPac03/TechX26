@@ -77,7 +77,7 @@ export function ExhibitReport({ journey, results, found, demo, onClose, onOpen }
   // Everything the story needs, worked out once.
   const [report] = useState(() => {
     const visited = journey.visited.filter((id) => exhibits.some((exhibit) => exhibit.id === id))
-    const name = (readPlayer()?.name || localStorage.getItem('techx26-name') || '').trim()
+    const name = (readPlayer()?.nickname || localStorage.getItem('techx26-name') || '').trim()
     const metres = Math.round(walkLength([entrance, ...visited]) * metresPerUnit / 5) * 5
     const byWing = wings.map((wing) => {
       const booths = exhibits.filter((exhibit) => exhibit.wingId === wing.id)

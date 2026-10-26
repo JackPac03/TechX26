@@ -4,6 +4,8 @@ import { BoothArt } from './BoothArt'
 import { challenges, type Challenge } from './challenges'
 import { boothNumber, exhibits, wings } from './data'
 import { SecretArt } from './Collectibles'
+import { ExplorerPrintKit } from './ExplorerSticker'
+import { explorerTypes } from './explorerTypes'
 import { secrets, secretUrl } from './secrets'
 
 const kinds: Record<Challenge['kind'], { name: string; detail: string }> = {
@@ -35,7 +37,10 @@ const todos = [
   { id: 'removed', text: 'Udemy and Employee Benefits aren’t on the new floor plan, so they were removed. Confirm they aren’t coming.' },
   { id: 'codes', text: `Brief hosts on their code words. ${exhibits.filter((exhibit) => challenges[exhibit.id].kind === 'code').length} booths use a Find out challenge.` },
   { id: 'qr', text: 'Reprint booth QR posters: the cyber booths split, Testing and Cyber Mate merged, and EAG is new.' },
-  { id: 'leaderboard', text: 'Points and the leaderboard are saved on each device only. Connect them to on-prem storage before the event.' },
+  { id: 'stickers', text: `Print the ${explorerTypes.length} explorer stickers from Explorer stickers below, and staff the welcome desk. The quiz tells people to collect their sticker there.` },
+  { id: 'info-pages', text: 'Help, Accessibility and Privacy in the footer are draft text. Confirm the welcome desk, venue access help and privacy wording, including the live leaderboard line in Privacy.' },
+  { id: 'networks', text: 'Confirm the venue’s Wi-Fi addresses with the network team before 27 November and update the TRUSTED_NETWORKS secret in GitHub, then re-deploy.' },
+  { id: 'leaderboard', text: 'The live leaderboard is built but off, so points stay on each device. Get Supabase approved (TPSA), then follow “Live leaderboard” in the README to switch it on.' },
 ]
 const todoKey = 'techx26-admin-todo'
 
@@ -138,6 +143,9 @@ export function AdminPanel({ lockdown, lockdownSet, onLockdown, demo, onDemo, on
           </tbody>
         </table>
       </div>
+      <h3 className="admin-subhead">Explorer stickers and cards</h3>
+      <p className="admin-note">One for each result of the “What kind of explorer are you?” quiz. People show their card at the welcome desk to collect the matching sticker. Downloads are print-ready PNGs with transparent corners.</p>
+      <ExplorerPrintKit />
       {children}
     </dialog>
   )

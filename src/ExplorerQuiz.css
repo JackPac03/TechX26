@@ -1,23 +1,38 @@
-/* Explorer personality quiz. All rules are scoped under .explorer-quiz. */
+/* Explorer personality quiz. Laid out like the booth popup: questions and results on the left,
+   the explorer card on a dark stage on the right. All rules are scoped under .explorer-quiz. */
 .explorer-quiz {
-  width: min(540px, calc(100% - 24px));
+  width: min(1040px, calc(100% - 24px));
+  height: min(90vh, 760px);
   max-width: none;
-  max-height: calc(100svh - 24px);
+  max-height: none;
   margin: auto;
   padding: 0;
   border: 0;
   border-radius: 22px;
-  overflow-y: auto;
-  overscroll-behavior: contain;
+  overflow: hidden;
   background: #f3f3ed;
   color: var(--ink, #160c19);
   box-shadow: 0 30px 90px rgba(0, 0, 0, .4);
 }
+.explorer-quiz[open] { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); }
 .explorer-quiz::backdrop { background: rgba(15, 5, 19, .76); backdrop-filter: blur(10px); }
-.explorer-quiz-inner { position: relative; padding: 40px 36px 30px; }
+.explorer-quiz-inner { position: relative; min-height: 0; padding: 44px 40px 36px 44px; overflow-y: auto; overscroll-behavior: contain; }
 
-.explorer-quiz-close { position: absolute; top: 14px; right: 14px; width: 40px; height: 40px; display: grid; place-items: center; border: 0; border-radius: 50%; background: rgba(22, 12, 25, .06); color: inherit; }
-.explorer-quiz-close:hover { background: rgba(22, 12, 25, .12); }
+.explorer-quiz-close { position: absolute; z-index: 3; top: 26px; right: 26px; width: 40px; height: 40px; display: grid; place-items: center; border: 0; border-radius: 50%; background: rgba(255, 255, 255, .92); color: var(--ink, #160c19); box-shadow: 0 6px 18px rgba(0, 0, 0, .25); }
+.explorer-quiz-close:hover { background: #fff; }
+
+/* The card stage, and the card that flips over to reveal your type */
+.explorer-quiz-stage { position: relative; min-height: 0; margin: 14px 14px 14px 0; display: grid; place-items: center; overflow: hidden; border-radius: 16px; background: radial-gradient(circle at 50% 42%, color-mix(in srgb, var(--from, #c31672) 45%, transparent), transparent 62%), #140a18; perspective: 1400px; }
+.explorer-flip { display: grid; transform-style: preserve-3d; transition: transform .9s cubic-bezier(.3, .9, .3, 1.05); }
+.explorer-flip.revealed { transform: rotateY(180deg); }
+.explorer-flip-back, .explorer-flip-front { grid-area: 1 / 1; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.explorer-flip-front { transform: rotateY(180deg); }
+.explorer-flip-front .explorer-card, .explorer-flip-back { box-shadow: 0 30px 60px rgba(0, 0, 0, .45); }
+.explorer-flip-back { width: 300px; min-height: 470px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; border: 8px solid #fff; border-radius: 24px; background: radial-gradient(circle at 50% 44%, rgba(195, 22, 114, .55), transparent 55%), repeating-conic-gradient(from 0deg at 50% 44%, rgba(255, 255, 255, .05) 0 5deg, transparent 5deg 10deg), linear-gradient(160deg, #24102e, #110913); color: #fff; text-align: center; }
+.explorer-flip-back .brand-mark { font-size: 20px; }
+.explorer-flip-seal { width: 112px; height: 112px; display: grid; place-items: center; border: 1px dashed rgba(255, 255, 255, .45); border-radius: 50%; box-shadow: 0 0 0 12px rgba(255, 255, 255, .04), 0 0 60px rgba(195, 22, 114, .6); color: #ffd9f0; }
+.explorer-flip-back strong { font-size: 18px; letter-spacing: -.02em; }
+.explorer-flip-back small { min-height: 1.5em; color: rgba(255, 255, 255, .6); font: 500 10px 'DM Mono', monospace; letter-spacing: .12em; text-transform: uppercase; }
 
 .explorer-quiz-kicker { display: flex; align-items: center; gap: 8px; margin: 0 48px 22px 0; color: #b81566; text-transform: uppercase; letter-spacing: .14em; font: 500 10px 'DM Mono', monospace; }
 .explorer-quiz-count { margin: 0 0 8px; color: #6f6873; text-transform: uppercase; letter-spacing: .08em; font: 500 10px 'DM Mono', monospace; }
@@ -26,8 +41,8 @@
 .explorer-quiz h2:focus { outline: none; }
 .explorer-quiz h2:focus-visible { outline: 2px solid #b81566; outline-offset: 4px; border-radius: 4px; }
 
-.explorer-quiz-progress { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 16px; }
-.explorer-quiz-progress span { height: 4px; border-radius: 4px; background: #e1dbe3; }
+.explorer-quiz-progress { display: flex; gap: 6px; margin-bottom: 16px; }
+.explorer-quiz-progress span { flex: 1; height: 4px; border-radius: 4px; background: #e1dbe3; }
 .explorer-quiz-progress .is-done { background: linear-gradient(90deg, #ef1721, #c31672 60%, #9619df); }
 
 .explorer-quiz-options { display: grid; gap: 8px; margin: 22px 0 14px; }
@@ -43,7 +58,14 @@
 .explorer-quiz-link { min-height: 36px; padding: 0 4px; display: inline-flex; align-items: center; gap: 6px; border: 0; background: transparent; color: #791044; font-size: 13px; font-weight: 600; }
 .explorer-quiz-link:hover { text-decoration: underline; }
 
-.explorer-quiz-tagline { margin: 10px 0 22px; color: #59635d; font-size: 14px; line-height: 1.6; }
+.explorer-quiz-tagline { margin: 10px 0 20px; color: #59635d; font-size: 15px; line-height: 1.6; }
+.explorer-quiz-collect { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: 1px dashed #c595be; border-radius: 14px; background: #f6e3ec; color: #791044; }
+.explorer-quiz-collect svg { flex: none; }
+.explorer-quiz-collect p { margin: 0; font-size: 13px; line-height: 1.45; }
+.explorer-quiz-collect strong { display: block; font-size: 14px; }
+.explorer-quiz-save { margin: 10px 0 20px; display: flex; gap: 8px; }
+.explorer-quiz-save button { flex: 1; }
+.explorer-quiz-save button:disabled { opacity: .6; }
 .explorer-quiz-tour { padding: 18px; border: 1px solid #d6cdd9; border-radius: 16px; background: #fbfafb; }
 .explorer-quiz-tour h3 { margin: 0; font-size: 22px; letter-spacing: -.03em; }
 .explorer-quiz-tour h3::before { content: ''; display: inline-block; width: 10px; height: 10px; margin-right: 9px; border-radius: 50%; vertical-align: 2px; background: var(--tour-colour, #c31672); }
@@ -60,8 +82,18 @@
 .explorer-quiz-secondary:hover { background: rgba(22, 12, 25, .05); }
 .explorer-quiz-back { margin-top: 10px; }
 
+/* Narrower screens stack like the booth popup. The stage only appears once the card is revealed. */
+@media (max-width: 900px) {
+  .explorer-quiz { width: min(640px, calc(100% - 16px)); height: auto; max-height: calc(100svh - 16px); overflow-y: auto; overscroll-behavior: contain; }
+  .explorer-quiz[open] { grid-template-columns: minmax(0, 1fr); grid-auto-rows: max-content; }
+  .explorer-quiz-inner { overflow: visible; }
+  .explorer-quiz-progress { margin-right: 48px; }
+  .explorer-quiz-stage { display: none; }
+  .explorer-quiz.is-result .explorer-quiz-stage { order: -1; display: grid; margin: 12px 12px 0; padding: 60px 0 32px; }
+  .explorer-quiz-close { top: 14px; right: 14px; }
+}
 @media (max-width: 600px) {
-  .explorer-quiz { width: calc(100% - 16px); max-height: calc(100svh - 16px); border-radius: 18px; }
+  .explorer-quiz { width: calc(100% - 16px); border-radius: 18px; }
   .explorer-quiz-inner { padding: 30px 18px 20px; }
   .explorer-quiz-kicker { margin-bottom: 16px; }
   .explorer-quiz-options { margin-top: 18px; }
@@ -75,9 +107,13 @@
   .explorer-quiz[open] { animation: explorer-quiz-in .25s ease-out both; }
   .explorer-quiz[open]::backdrop { animation: explorer-quiz-fade .25s ease-out both; }
   .explorer-quiz-option:active { transform: scale(.99); }
+  .explorer-flip.revealed { animation: explorer-flip-in 1s cubic-bezier(.3, .9, .3, 1.05) .15s both; }
+  .explorer-flip:not(.revealed) { animation: explorer-card-bob 4s ease-in-out infinite; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .explorer-quiz-option { transition: none; }
+  .explorer-quiz-option, .explorer-flip { transition: none; }
 }
 @keyframes explorer-quiz-in { from { opacity: 0; transform: translateY(12px) scale(.98); } to { opacity: 1; transform: none; } }
+@keyframes explorer-flip-in { from { transform: rotateY(0); } to { transform: rotateY(180deg); } }
+@keyframes explorer-card-bob { 50% { translate: 0 -10px; rotate: 1.5deg; } }
 @keyframes explorer-quiz-fade { from { opacity: 0; } to { opacity: 1; } }

@@ -3,6 +3,7 @@ import { Share2 } from 'lucide-react'
 import { BoothArt } from './BoothArt'
 import { WingBadge } from './Collectibles'
 import { boothNumber, exhibits, wings, type Exhibit, type Wing } from './data'
+import { playStamp } from './sound'
 
 export type Celebration = { exhibit: Exhibit; count: number; wingDone?: Wing; passportDone: boolean }
 
@@ -15,7 +16,9 @@ export function CelebrationOverlay({ celebration, onDone, onShare }: { celebrati
   const finish = useEffectEvent(onDone)
 
   useEffect(() => {
-    navigator.vibrate?.([24, 60, 90])
+    // A heavy thunk as the stamp lands, then two light taps with the chime.
+    playStamp(milestone)
+    navigator.vibrate?.([45, 90, 15, 60, 15])
     const timer = setTimeout(finish, milestone ? 5200 : 2800)
     return () => clearTimeout(timer)
   }, [celebration, milestone])

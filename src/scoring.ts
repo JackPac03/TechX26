@@ -8,13 +8,37 @@ export const challengeBase = 50
 export const challengeBonus = 50
 export const challengePoints = (performance: number) => challengeBase + Math.round(challengeBonus * Math.min(1, Math.max(0, performance)))
 
-export type Player = { name: string; email: string }
+// Players pick a nickname, and a random id gives them a short code to prove the nickname is theirs.
+export type Player = { id: string; nickname: string }
+export const playerKey = 'techx26-player'
 export const readPlayer = (): Player | null => {
   try {
-    return JSON.parse(localStorage.getItem('techx26-player') ?? 'null')
+    const saved = JSON.parse(localStorage.getItem(playerKey) ?? 'null')
+    if (!saved) return null
+    if (saved.id && saved.nickname) return saved
+    // Early test saves kept a name and email. Keep the name as the nickname and drop the email.
+    const player = { id: crypto.randomUUID(), nickname: String(saved.name ?? '').slice(0, 20) }
+    localStorage.setItem(playerKey, JSON.stringify(player))
+    return player
   } catch {
     return null
   }
+}
+
+// Four easy-to-read characters, for example K7Q2. Staff match it against the leaderboard to hand out prizes.
+const codeAlphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+export const playerCode = (id: string) => {
+  const value = parseInt(id.replace(/-/g, '').slice(0, 5), 16)
+  return Array.from({ length: 4 }, (_, index) => codeAlphabet[(value >> (index * 5)) & 31]).join('')
+}
+
+// Nicknames show on a shared leaderboard, so keep them short and not an email address or link.
+export const nicknameProblem = (nickname: string) => {
+  const value = nickname.trim()
+  if (value.length < 2) return 'Pick a nickname with at least 2 characters.'
+  if (value.length > 20) return 'Keep your nickname to 20 characters or fewer.'
+  if (/@|https?:|www\.|\.com/i.test(value)) return 'Use a nickname, not an email address or link.'
+  return ''
 }
 
 // Best challenge points per booth. Older saves only kept booth ids, so they count as a base completion.
@@ -28,7 +52,8 @@ export const readResults = (): Record<string, number> => {
   }
 }
 
-export type Entry = { name: string; you?: boolean; visited: string[]; results: Record<string, number>; secrets?: string[] }
+// Live leaderboard rows arrive with their points already worked out.
+export type Entry = { name: string; code?: string; points?: number; you?: boolean; visited: string[]; results: Record<string, number>; secrets?: string[] }
 export const boothScore = (entry: Entry, id: string) => (entry.visited.includes(id) ? stampPoints : 0) + (entry.results[id] ?? 0)
 export const totalScore = (entry: Entry) => entry.visited.length * stampPoints + (entry.secrets?.length ?? 0) * secretPoints + Object.values(entry.results).reduce((sum, points) => sum + points, 0)
 

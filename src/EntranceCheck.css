@@ -1,0 +1,76 @@
+/* The whole site waits behind this page until the phone is on a trusted network */
+.entrance-gate { min-height: 100vh; min-height: 100svh; padding: 24px; display: grid; place-items: center; background: radial-gradient(circle at 70% 10%, rgba(195,22,114,.35), transparent 55%), linear-gradient(160deg, #1d0b22, #0f0513 70%); }
+
+/* Entrance criteria: copy on the left, the shut museum front on the right */
+.entrance-check { position: relative; width: min(920px, 100%); padding: 44px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 360px); grid-template-areas: "copy art"; align-items: center; gap: 40px; border-radius: 22px; background: #f3f3ed; color: var(--ink); box-shadow: 0 30px 90px rgba(0,0,0,.4); }
+.entrance-copy { grid-area: copy; }
+.entrance-copy .kicker { margin: 0 0 12px; font: 500 11px 'DM Mono', monospace; letter-spacing: .16em; text-transform: uppercase; color: #c31672; }
+.entrance-copy h1 { margin: 0; font-size: clamp(28px, 3.6vw, 40px); line-height: 1.08; letter-spacing: -.03em; font-weight: 600; }
+.entrance-lead { margin: 14px 0 0; color: #625a66; font-size: 14px; line-height: 1.6; }
+.entrance-copy h2 { margin: 24px 0 10px; font: 500 11px 'DM Mono', monospace; letter-spacing: .16em; text-transform: uppercase; color: #8b838e; }
+.entrance-criteria { margin: 0; padding: 0; display: grid; gap: 8px; list-style: none; counter-reset: criteria; }
+.entrance-criteria li { position: relative; padding: 12px 14px 12px 50px; border-radius: 14px; background: white; color: #4d4551; font-size: 13px; line-height: 1.5; counter-increment: criteria; }
+.entrance-criteria li::before { content: counter(criteria); position: absolute; left: 14px; top: 11px; width: 24px; height: 24px; display: grid; place-items: center; border-radius: 50%; background: #f5dceb; color: #b81566; font: 600 12px 'DM Mono', monospace; }
+.entrance-criteria b { color: var(--ink); }
+.entrance-path { white-space: nowrap; }
+.entrance-criteria code { padding: 1px 6px; border-radius: 6px; background: #f1ecf2; color: var(--ink); font: 500 12px 'DM Mono', monospace; white-space: nowrap; }
+.entrance-still { margin: 14px 0 0; color: #b81566; font-size: 13px; font-weight: 600; }
+.entrance-actions { margin-top: 20px; display: flex; flex-wrap: wrap; gap: 10px; }
+.entrance-actions .button { border-radius: 99px; }
+.entrance-actions .spin { animation: entrance-spin .8s linear infinite; }
+.entrance-ip { margin: 16px 0 0; color: #8b838e; font: 500 11px 'DM Mono', monospace; letter-spacing: .06em; }
+
+.entrance-art { grid-area: art; overflow: hidden; border-radius: 20px; box-shadow: 0 20px 40px -18px rgba(22,12,25,.6); }
+.entrance-art svg { display: block; width: 100%; height: auto; }
+.entrance-frieze { fill: rgba(255,255,255,.7); font: 600 8px 'DM Mono', monospace; letter-spacing: .24em; }
+.entrance-sign-text { fill: #c31672; font: 700 10px 'DM Mono', monospace; letter-spacing: .14em; }
+.entrance-wifi { stroke: #6b4679; fill: #6b4679; color: #6b4679; }
+.entrance-wifi path { stroke: currentColor; }
+.entrance-wifi circle { fill: currentColor; stroke: none; }
+.entrance-glow { opacity: .25; transition: opacity .8s .3s; }
+.entrance-door { transition: transform 1.1s cubic-bezier(.5, 0, .2, 1) .2s; }
+.entrance-door.left { transform-origin: 116px 200px; }
+.entrance-door.right { transform-origin: 204px 200px; }
+.entrance-sign { transform-origin: 160px 156px; transition: opacity .3s; }
+.entrance-rope { transform-origin: 160px 268px; transition: transform .6s, opacity .6s; }
+
+/* Once the network checks out, the sign lights up, the rope drops and the doors swing open */
+.entrance-gate.open .entrance-wifi { color: #ff7ac0; filter: drop-shadow(0 0 6px #ff3fa4); }
+.entrance-gate.open .entrance-glow { opacity: 1; }
+.entrance-gate.open .entrance-door.left { transform: scaleX(.12); }
+.entrance-gate.open .entrance-door.right { transform: scaleX(.12); }
+.entrance-gate.open .entrance-sign { opacity: 0; }
+.entrance-gate.open .entrance-rope { transform: translateY(12px) scaleY(.4); opacity: 0; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .entrance-gate:not(.open) .entrance-wifi { animation: entrance-flicker 3.2s steps(1) infinite; }
+  .entrance-gate:not(.open) .entrance-sign { animation: entrance-swing 2.6s ease-in-out infinite; }
+  .entrance-stars circle { animation: entrance-twinkle 3s ease-in-out infinite alternate; }
+  .entrance-stars circle:nth-child(2n) { animation-delay: -1.4s; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .entrance-door, .entrance-glow, .entrance-rope { transition: none; }
+}
+@keyframes entrance-flicker {
+  0%, 100% { color: #6b4679; filter: none; }
+  8%, 14% { color: #ff7ac0; filter: drop-shadow(0 0 6px #ff3fa4); }
+  11% { color: #6b4679; filter: none; }
+  60% { color: #ff7ac0; filter: drop-shadow(0 0 6px #ff3fa4); }
+  62% { color: #6b4679; filter: none; }
+}
+@keyframes entrance-swing { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
+@keyframes entrance-twinkle { from { opacity: .3; } to { opacity: 1; } }
+@keyframes entrance-spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 760px) {
+  .entrance-check { grid-template-columns: minmax(0, 1fr); grid-template-areas: "art" "copy"; gap: 22px; padding: 32px 24px 28px; }
+  .entrance-art { width: min(100%, 300px); margin: 0 auto; }
+}
+@media (max-width: 600px) {
+  .entrance-gate { padding: 12px; place-items: start center; }
+  .entrance-check { padding: 22px 20px calc(24px + env(safe-area-inset-bottom)); gap: 18px; border-radius: 22px; }
+  .entrance-art { width: min(64%, 230px); border-radius: 16px; }
+  .entrance-copy h1 { font-size: 25px; }
+  .entrance-lead { font-size: 13px; }
+  .entrance-actions .button { flex: 1; }
+}

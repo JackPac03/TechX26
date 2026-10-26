@@ -1,0 +1,23 @@
+/* Explorer stickers and trading cards */
+.explorer-sticker { display: block; overflow: visible; }
+
+.explorer-card { position: relative; width: 300px; max-width: 100%; margin: 0 auto; padding: 14px 16px 12px; overflow: hidden; border: 8px solid #fff; border-radius: 24px; background: radial-gradient(circle at 50% 28%, color-mix(in srgb, var(--from) 60%, transparent), transparent 60%), linear-gradient(160deg, #24102e, #110913); color: #fff; text-align: center; font-family: 'Manrope', sans-serif; }
+.explorer-card-top { display: flex; align-items: flex-start; justify-content: space-between; text-align: right; }
+.explorer-card-top .brand-mark { font-size: 18px; letter-spacing: -1.2px; }
+.explorer-card-top small { color: rgba(255,255,255,.65); font: 500 8px/1.5 'DM Mono', monospace; letter-spacing: .12em; text-transform: uppercase; }
+.explorer-card .explorer-sticker { width: 172px; margin: 6px auto 4px; filter: drop-shadow(0 12px 18px rgba(0,0,0,.4)); }
+.explorer-card h3 { margin: 6px 0 0; font-size: 23px; line-height: 1.1; letter-spacing: -.03em; }
+.explorer-card-tagline { margin: 6px 4px 12px; color: rgba(255,255,255,.75); font-size: 12px; line-height: 1.45; }
+.explorer-card-stats { margin: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.explorer-card-stats dt { color: rgba(255,255,255,.6); font: 500 8px 'DM Mono', monospace; letter-spacing: .1em; text-transform: uppercase; }
+.explorer-card-stats dd { margin: 5px 0 0; display: flex; justify-content: center; gap: 3px; }
+.explorer-card-stats i { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.2); }
+.explorer-card-stats i.on { background: #fff; }
+.explorer-card-fact { margin: 8px 0 0; padding: 8px 10px; border-radius: 10px; background: rgba(255,255,255,.08); font-size: 12px; line-height: 1.4; text-align: left; }
+.explorer-card-fact small { display: block; margin-bottom: 2px; color: color-mix(in srgb, var(--from) 55%, white); font: 500 8px 'DM Mono', monospace; letter-spacing: .12em; text-transform: uppercase; }
+.explorer-print-kit { margin-top: 24px; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 28px 20px; }
+.explorer-print-kit figure { margin: 0; }
+.explorer-print-kit figcaption { margin-top: 12px; display: flex; justify-content: center; gap: 8px; }
+.explorer-print-kit button { min-height: 36px; padding: 0 14px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid #d6cdd9; border-radius: 99px; background: white; color: var(--ink); font-size: 12px; font-weight: 700; }
+.explorer-print-kit button:hover { border-color: #b81566; }
+.explorer-card-foot { margin: 10px 0 0; color: rgba(255,255,255,.45); font: 500 8px 'DM Mono', monospace; letter-spacing: .12em; text-transform: uppercase; }

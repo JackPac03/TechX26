@@ -19,7 +19,7 @@ const doors = (() => {
 
 // A collectible admission ticket for the museum, with the visitor's name and chosen tour.
 export function TicketBooth({ onClose }: { onClose: () => void }) {
-  const [name, setName] = useState(() => localStorage.getItem('techx26-name') || readPlayer()?.name || '')
+  const [name, setName] = useState(() => localStorage.getItem('techx26-name') || readPlayer()?.nickname || '')
   const [tourId, setTourId] = useState(() => localStorage.getItem('techx26-ticket-tour') ?? '')
   const [style, setStyle] = useState<Style>(() => (localStorage.getItem('techx26-ticket-style') as Style) in styles ? localStorage.getItem('techx26-ticket-style') as Style : 'midnight')
   const [printKey, setPrintKey] = useState(0)

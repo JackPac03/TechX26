@@ -1,12 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { Calendar, Check, Database, FileText, Laptop, MessageSquare, Server, Shield, Users, Video, Wifi, X } from 'lucide-react'
 import { bugSnippets, challengeKinds, contrastRounds, phishMessages, roadmapFeatures, type Challenge } from './challenges'
-import { challengePoints, readPlayer } from './scoring'
+import { challengePoints, nicknameProblem, playerKey, readPlayer } from './scoring'
 
 // performance runs from 0 to 1 and sets the bonus points.
 type Done = (passed: boolean, summary: string, performance: number) => void
-
-const playerKey = 'techx26-player'
 
 const shuffle = <T,>(items: T[]) => {
   const copy = [...items]
@@ -426,17 +424,15 @@ function Game({ challenge, onDone }: { challenge: Challenge; onDone: Done }) {
   }
 }
 
-const emailPattern = /^[^\s@]+@westpac\.(com\.au|co\.nz)$/i
-
-// Plays a booth challenge. The first win asks for a name and Westpac email, which are remembered.
+// Plays a booth challenge. The first win asks for a leaderboard nickname, which is remembered.
 // In demo mode (from the admin panel) nothing is saved and no details are asked for.
 export function ChallengeSheet({ challenge, accent, onClose, onComplete, demo }: { challenge: Challenge; accent: string; onClose: () => void; onComplete: (points: number) => void; demo?: boolean }) {
   const [attempt, setAttempt] = useState(0)
   const [result, setResult] = useState<{ passed: boolean; summary: string; points: number } | null>(null)
   const [player, setPlayer] = useState(readPlayer)
-  const [name, setName] = useState(() => localStorage.getItem('techx26-name') ?? '')
-  const [email, setEmail] = useState('')
+  const [nickname, setNickname] = useState('')
   const [touched, setTouched] = useState(false)
+  const problem = nicknameProblem(nickname)
 
   useEffect(() => {
     const close = (event: KeyboardEvent) => { if (event.key === 'Escape') onClose() }
@@ -455,10 +451,9 @@ export function ChallengeSheet({ challenge, accent, onClose, onComplete, demo }:
   const saveProfile = (event: React.FormEvent) => {
     event.preventDefault()
     setTouched(true)
-    if (!name.trim() || !emailPattern.test(email.trim())) return
-    const next = { name: name.trim(), email: email.trim().toLowerCase() }
+    if (problem) return
+    const next = { id: crypto.randomUUID(), nickname: nickname.trim() }
     localStorage.setItem(playerKey, JSON.stringify(next))
-    if (!localStorage.getItem('techx26-name')) localStorage.setItem('techx26-name', next.name)
     setPlayer(next)
     onComplete(result!.points)
   }
@@ -486,11 +481,9 @@ export function ChallengeSheet({ challenge, accent, onClose, onComplete, demo }:
           <form className="challenge-profile" onSubmit={saveProfile} noValidate>
             <span className="challenge-result-icon" aria-hidden="true"><Check /></span>
             <h3>Challenge complete!</h3>
-            <p><b>+{result.points} points.</b> {result.summary}. Add your details so we can contact you if you win. We’ll remember them for your next challenges.</p>
-            <label>Your name<input value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" placeholder="e.g. Jack Hodges" /></label>
-            {touched && !name.trim() && <small className="game-hint">Please add your name.</small>}
-            <label>Westpac email<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="email" inputMode="email" placeholder="name@westpac.com.au" /></label>
-            {touched && !emailPattern.test(email.trim()) && <small className="game-hint">Use your Westpac email, ending in @westpac.com.au.</small>}
+            <p><b>+{result.points} points.</b> {result.summary}. Pick a nickname for the leaderboard. No real names needed, and we’ll remember it for your next challenges.</p>
+            <label>Nickname<input value={nickname} onChange={(event) => setNickname(event.target.value)} autoComplete="nickname" maxLength={20} placeholder="e.g. Quantum Koala" /></label>
+            {touched && problem && <small className="game-hint">{problem}</small>}
             <button className="game-next">Save and claim my points</button>
           </form>
         )}
@@ -500,7 +493,7 @@ export function ChallengeSheet({ challenge, accent, onClose, onComplete, demo }:
             <span className="challenge-result-icon" aria-hidden="true"><Check /></span>
             <h3>Challenge complete!</h3>
             <p className="challenge-points">+{result.points} points</p>
-            <p>{result.summary}. {demo ? 'Demo mode, so nothing was saved.' : `Saved for ${player!.name}.`}</p>
+            <p>{result.summary}. {demo ? 'Demo mode, so nothing was saved.' : `Saved for ${player!.nickname}.`}</p>
             <button className="game-next" onClick={onClose}>{demo ? 'Close demo' : 'Back to the booth'}</button>
           </div>
         )}

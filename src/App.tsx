@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 import type { IScannerControls } from '@zxing/browser'
 import {
   ArrowDown,
@@ -31,7 +31,8 @@ import { ChallengeSheet } from './ChallengeSheet'
 import { challengeKinds, challenges as boothChallenges } from './challenges'
 import { Leaderboard } from './Leaderboard'
 import { AdminPanel } from './Admin'
-import { readResults, totalScore } from './scoring'
+import { playerCode, readPlayer, readResults, totalScore } from './scoring'
+import { queueProgress, syncEnabled } from './sync'
 import { QrStudio } from './QrStudio'
 import { Schedule } from './Schedule'
 import { TourMap } from './Tours'
@@ -40,12 +41,16 @@ import { ShareKit } from './ShareKit'
 import { nextStop } from './venue'
 import { VenueMap } from './VenueMap'
 import { ExplorerQuiz } from './ExplorerQuiz'
+import { explorerTypeKey, readExplorerType } from './explorerTypes'
 import { CuratorSecret, ExplorerAdventures, ExplorerPassport } from './ExplorerJourney'
-import { advanceTrail, emptyTrail, explorerBadges, explorerTitle, mysteryStops, readTrail, trailKey, type ExplorerJourney } from './explorer'
+import { advanceTrail, emptyTrail, explorerBadges, explorerTitle, mysteryStops, nightFinds, readTrail, trailKey, type ExplorerJourney } from './explorer'
 import { SecretReveal, SecretShelf, WingBadge } from './Collectibles'
 import { ExhibitReport } from './ExhibitReport'
 import { TicketBooth } from './TicketBooth'
 import { findSecret, readSecrets, recordStampTime, secretsKey, stampTimesKey, type Secret } from './secrets'
+import { AfterHours, GuardNotice } from './Mischief'
+import { InfoSheet, type InfoTopic } from './InfoSheet'
+import { playAlarm, playFind, playSwitch } from './sound'
 
 const readIds = (key: string) => {
   try {
@@ -170,6 +175,7 @@ function App() {
   const [secretOpen, setSecretOpen] = useState(false)
   const logoTaps = useRef({ count: 0, last: 0 })
   const [quizOpen, setQuizOpen] = useState(false)
+  const [explorerType, setExplorerType] = useState(readExplorerType)
   const [mapRequest, setMapRequest] = useState<{ key: number; tourId?: string; hintId?: string }>({ key: 0 })
   const [discovery, setDiscovery] = useState<{ title: string; detail: string } | null>(null)
   const [found, setFound] = useState<string[]>(() => {
@@ -182,9 +188,26 @@ function App() {
   const [secretShown, setSecretShown] = useState<{ secret: Secret; isNew: boolean } | null>(() => linkedSecret && !startsLocked ? { secret: linkedSecret, isNew: linkedSecretIsNew } : null)
   const [xFound, setXFound] = useState(() => localStorage.getItem('techx26-x-found') === '1')
   const [xTaps, setXTaps] = useState({ count: 0, last: 0, spin: 0, burst: 0 })
+  const spunAt = useRef(0)
+  const pokes = useRef({ count: 0, last: 0 })
+  const [ropeTugs, setRopeTugs] = useState(0)
+  const [guard, setGuard] = useState({ visits: 0, on: false })
+  const [guardFound, setGuardFound] = useState(() => localStorage.getItem('techx26-guard-found') === '1')
+  const [afterHours, setAfterHours] = useState(false)
+  const [nightFound, setNightFound] = useState(() => localStorage.getItem('techx26-night-found') === '1')
+  const [darkFinds, setDarkFinds] = useState<string[]>(() => {
+    try {
+      return (JSON.parse(localStorage.getItem('techx26-night-finds') ?? '[]') as string[]).filter((id) => nightFinds.some((find) => find.id === id))
+    } catch {
+      return []
+    }
+  })
   const [ticketOpen, setTicketOpen] = useState(false)
   const [reportOpen, setReportOpen] = useState(false)
-  const journey: ExplorerJourney = { visited, surprisePicks, trail, secretFound, xFound }
+  const [info, setInfo] = useState<InfoTopic | null>(null)
+  // The passport shows your leaderboard nickname and code once you've picked one.
+  const passportPlayer = readPlayer()
+  const journey: ExplorerJourney = { visited, surprisePicks, trail, secretFound, xFound, nightFound, guardFound, findsDone: darkFinds.length === nightFinds.length }
   const [results, setResults] = useState<Record<string, number>>(readResults)
   const challenges = Object.keys(results)
   const [playing, setPlaying] = useState<{ id: string; demo?: boolean } | null>(null)
@@ -217,6 +240,13 @@ function App() {
     const timer = setTimeout(() => setDiscovery(null), 6000)
     return () => clearTimeout(timer)
   }, [discovery])
+
+  // Once someone has a leaderboard nickname, keep their progress in step with the live leaderboard.
+  useEffect(() => {
+    const player = readPlayer()
+    if (!syncEnabled || !player || lockdown) return
+    queueProgress({ nickname: player.nickname, code: playerCode(player.id), stamps: visited, secrets: found, results, explorer_type: explorerType?.id ?? null })
+  }, [visited, found, results, explorerType, lockdown])
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24)
@@ -300,10 +330,14 @@ function App() {
   }
 
   const resetProgress = () => {
-    for (const key of ['techx26-visited', 'techx26-challenges', 'techx26-results', 'techx26-player', 'techx26-surprise-picks', 'techx26-curator-secret', trailKey, secretsKey, stampTimesKey, 'techx26-x-found']) localStorage.removeItem(key)
+    for (const key of ['techx26-visited', 'techx26-challenges', 'techx26-results', 'techx26-player', 'techx26-surprise-picks', 'techx26-curator-secret', trailKey, secretsKey, stampTimesKey, 'techx26-x-found', 'techx26-night-found', 'techx26-guard-found', 'techx26-night-finds', explorerTypeKey]) localStorage.removeItem(key)
     setVisited([])
     setFound([])
     setXFound(false)
+    setNightFound(false)
+    setDarkFinds([])
+    setExplorerType(undefined)
+    setGuardFound(false)
     setResults({})
     setSurprisePicks([])
     setTrail(emptyTrail)
@@ -425,21 +459,84 @@ function App() {
     setSecretShown({ secret, isNew })
   }
 
+  // Keep poking the X right after it spins, or tug the velvet rope, and museum security steps in.
+  const pokeExhibit = (now: number) => {
+    pokes.current = { count: now - pokes.current.last < 1800 ? pokes.current.count + 1 : 1, last: now }
+    if (pokes.current.count < 3) return false
+    pokes.current = { count: 0, last: 0 }
+    spunAt.current = 0
+    setGuard({ visits: guard.visits + 1, on: true })
+    playAlarm()
+    navigator.vibrate?.([180, 90, 180, 90, 180])
+    if (!guardFound) {
+      setGuardFound(true)
+      localStorage.setItem('techx26-guard-found', '1')
+      setTimeout(() => announceDiscovery({ ...journey, guardFound: true }), 2400)
+    }
+    return true
+  }
+
   // Five quick taps on the floating X send it spinning and unlock a secret badge.
   const tapX = () => {
     const now = Date.now()
+    if (now - spunAt.current < 5000 && pokeExhibit(now)) {
+      setXTaps({ ...xTaps, count: 0, last: 0 })
+      return
+    }
     const count = now - xTaps.last < 1800 ? xTaps.count + 1 : 1
     if (count < 5) {
       setXTaps({ ...xTaps, count, last: now })
       return
     }
     setXTaps({ count: 0, last: 0, spin: xTaps.spin + 1080, burst: xTaps.burst + 1 })
+    spunAt.current = now
     navigator.vibrate?.([20, 40, 20, 40, 60])
     if (xFound) return
     setXFound(true)
     localStorage.setItem('techx26-x-found', '1')
     setTimeout(() => announceDiscovery({ ...journey, xFound: true }), 1400)
   }
+
+  const tugRope = () => {
+    setRopeTugs(ropeTugs + 1)
+    pokeExhibit(Date.now())
+  }
+
+  // The foyer light switch, or the Konami code on a keyboard, turns the museum lights off.
+  const toggleLights = () => {
+    playSwitch()
+    setAfterHours(!afterHours)
+    if (afterHours || nightFound) return
+    setNightFound(true)
+    localStorage.setItem('techx26-night-found', '1')
+    setTimeout(() => announceDiscovery({ ...journey, nightFound: true }), 1200)
+  }
+
+  const findInDark = (id: string) => {
+    if (darkFinds.includes(id)) return
+    const next = [...darkFinds, id]
+    const done = next.length === nightFinds.length
+    setDarkFinds(next)
+    localStorage.setItem('techx26-night-finds', JSON.stringify(next))
+    playFind(done)
+    navigator.vibrate?.(done ? [20, 40, 20, 40, 60] : 20)
+    if (done) announceDiscovery({ ...journey, findsDone: true })
+  }
+
+  const konami = useEffectEvent(toggleLights)
+  useEffect(() => {
+    if (lockdown) return
+    const code = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a']
+    let step = 0
+    const onKey = (event: KeyboardEvent) => {
+      step = event.key.toLowerCase() === code[step].toLowerCase() ? step + 1 : event.key === code[0] ? 1 : 0
+      if (step < code.length) return
+      step = 0
+      konami()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [lockdown])
 
   const revealScannedExhibit = (value: string) => {
     const secret = findSecret(value)
@@ -534,20 +631,15 @@ function App() {
               <div className="techx-ribbon ribbon-shine" />
             </div>
             {xTaps.burst > 0 && <div key={xTaps.burst} className="foyer-burst">{Array.from({ length: 28 }, (_, index) => <i key={index} style={{ '--a': `${index * 137.5}deg`, '--d': `${120 + ((index * 53) % 160)}px`, '--c': wings[index % wings.length].colour, '--t': `${(index % 5) * 40}ms` } as React.CSSProperties} />)}</div>}
-            <svg className="foyer-rope" viewBox="0 0 400 90">
-              <path className="rope" d="M32 26 Q200 78 368 26" />
+            <svg className="foyer-rope" viewBox="0 0 400 90" onClick={lockdown ? undefined : tugRope}>
+              <path key={ropeTugs} className={ropeTugs ? 'rope tug' : 'rope'} d="M32 26 Q200 78 368 26" />
+              <path className="rope-hit" d="M32 26 Q200 78 368 26" />
               {[32, 368].map((x) => <g key={x} className="stanchion"><rect x={x - 3} y={24} width={6} height={58} rx={3} /><ellipse cx={x} cy={84} rx={16} ry={4} /><circle cx={x} cy={22} r={7} /></g>)}
             </svg>
             <div className="foyer-placard"><small>Exhibit 01</small><b>The Possible</b><span>TECHx26 · {exhibits.length} booths inside</span></div>
           </div>
-          <div className="hero-arrows" aria-hidden="true">
-            {[0, 1, 2].map((index) => (
-              <svg key={index} className={`hero-arrow hero-arrow-${index + 1}`} viewBox="0 0 130 80" fill="none">
-                <path className="arrow-trail" d="M8 68 C35 68 13 28 43 30 S83 48 114 12" />
-                <path className="arrow-tip" d="m92 13 23-2-2 23" />
-              </svg>
-            ))}
-          </div>
+          {!lockdown && <button className={afterHours ? 'light-switch off' : 'light-switch'} onClick={toggleLights} aria-label={afterHours ? 'Turn the museum lights back on' : 'Turn off the museum lights'}><i /></button>}
+          {guard.on && <div key={guard.visits} className="hero-alarm" aria-hidden="true" />}
           <div className="hero-footnote"><span>01</span><p>Technology is not the exhibit.<br />What people do with it is.</p></div>
           <dl className="hero-stats">
             <div><dt>Booths</dt><dd>{exhibits.length}</dd></div>
@@ -595,7 +687,7 @@ function App() {
           </div>
         </section>
 
-        {!lockdown && <ExplorerAdventures trail={trail} onStart={() => setTrailStarted(true)} onPause={() => setTrailStarted(false)} onHint={() => goToMap({ hintId: mysteryStops[trail.step].id })} onQuiz={() => setQuizOpen(true)} />}
+        {!lockdown && <ExplorerAdventures explorerType={explorerType} trail={trail} onStart={() => setTrailStarted(true)} onPause={() => setTrailStarted(false)} onHint={() => goToMap({ hintId: mysteryStops[trail.step].id })} onQuiz={() => setQuizOpen(true)} />}
 
         <section className="section exhibit-section" id="exhibits">
           <div className="section-heading exhibit-heading" data-reveal>
@@ -676,7 +768,7 @@ function App() {
           </div>
           <div className="passport-card-wrap" data-reveal>
             <div className="passport-card">
-              <div className="passport-top"><span>TECH<span>x</span>26</span><small>EXPLORER PASS<br />NO. 026—841</small></div>
+              <div className="passport-top"><span>TECH<span>x</span>26</span><small>EXPLORER PASS<br />{passportPlayer ? `${passportPlayer.nickname} · #${playerCode(passportPlayer.id)}` : 'NO. 026—841'}</small></div>
               <div className="passport-progress">
                 <div className="progress-label"><span>Collection progress</span><strong>{progress}%</strong></div>
                 <div className="progress-track"><span style={{ width: `${progress}%` }} /></div>
@@ -715,7 +807,7 @@ function App() {
           <div className="footer-links">
             <button className="footer-qr" onClick={() => setQrOpen(true)}><QrCode size={15} /> Booth QR codes</button>
             <button className="footer-admin" aria-haspopup="dialog" onClick={(event) => { event.currentTarget.focus({ preventScroll: true }); setAdminOpen(true) }}>Admin</button>
-            <a href="#top">Accessibility</a><a href="#top">Privacy</a><a href="#top">Help</a>
+            {(['accessibility', 'privacy', 'help'] as const).map((topic) => <button key={topic} className="footer-admin" aria-haspopup="dialog" onClick={() => setInfo(topic)}>{topic[0].toUpperCase() + topic.slice(1)}</button>)}
           </div>
         </div>
         <p className="footer-credit">Created by Jack Hodges – 2026 Technology Graduate</p>
@@ -798,9 +890,11 @@ function App() {
 
       {adminOpen ? <AdminPanel lockdown={lockdown} lockdownSet={localStorage.getItem(lockdownKey) !== null} onLockdown={changeLockdown} demo={demoBoard} onDemo={showDemoBoard} onTry={(id) => setPlaying({ id, demo: true })} onReset={resetProgress} onClose={() => setAdminOpen(false)}>{challengeSheet}</AdminPanel> : challengeSheet}
 
+      {info && <InfoSheet topic={info} onClose={() => setInfo(null)} />}
+
       {qrOpen && <QrStudio onClose={() => setQrOpen(false)} />}
 
-      {quizOpen && <ExplorerQuiz onClose={() => setQuizOpen(false)} onChoose={(tourId) => { setQuizOpen(false); goToMap({ tourId }) }} />}
+      {quizOpen && <ExplorerQuiz saved={explorerType} onResult={setExplorerType} onClose={() => setQuizOpen(false)} onChoose={(tourId) => { setQuizOpen(false); goToMap({ tourId }) }} />}
 
       {secretOpen && <CuratorSecret onClose={() => setSecretOpen(false)} />}
 
@@ -815,6 +909,10 @@ function App() {
       {reportOpen && <ExhibitReport journey={journey} results={results} found={found} demo={demoBoard} onClose={() => setReportOpen(false)} onOpen={openExhibit} />}
 
       {secretShown && <SecretReveal secret={secretShown.secret} found={found} isNew={secretShown.isNew} onClose={() => setSecretShown(null)} />}
+
+      {afterHours && !lockdown && <AfterHours found={darkFinds} onFind={findInDark} onExit={toggleLights} />}
+
+      {guard.on && <GuardNotice visit={guard.visits} onClose={() => setGuard({ ...guard, on: false })} />}
 
       {scanOpen && <ScannerModal onClose={() => setScanOpen(false)} onScan={revealScannedExhibit} />}
     </div>

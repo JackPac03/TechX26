@@ -1,9 +1,11 @@
 import { useEffect, useRef } from 'react'
 import { ArrowRight, Check, Compass, KeyRound, LockKeyhole, MapPin, Sparkles, X } from 'lucide-react'
 import { explorerBadges, explorerTitle, mysteryStops, type ExplorerJourney as Journey, type MysteryTrail } from './explorer'
+import { ExplorerSticker } from './ExplorerSticker'
+import { explorerTypes, type ExplorerType } from './explorerTypes'
 import './ExplorerJourney.css'
 
-export function ExplorerAdventures({ trail, onStart, onPause, onHint, onQuiz }: { trail: MysteryTrail; onStart: () => void; onPause: () => void; onHint: () => void; onQuiz: () => void }) {
+export function ExplorerAdventures({ explorerType, trail, onStart, onPause, onHint, onQuiz }: { explorerType?: ExplorerType; trail: MysteryTrail; onStart: () => void; onPause: () => void; onHint: () => void; onQuiz: () => void }) {
   const clue = mysteryStops[trail.step]
   const complete = trail.step === mysteryStops.length
   return (
@@ -14,9 +16,11 @@ export function ExplorerAdventures({ trail, onStart, onPause, onHint, onQuiz }: 
       </div>
       <div className="explorer-adventure-grid">
         <article className="explorer-adventure explorer-personality">
-          <span className="explorer-adventure-icon" aria-hidden="true"><Compass size={25} /><i /><i /></span>
-          <div><p className="kicker">Three questions. Your kind of tour.</p><h3>What’s your explorer type?</h3><p>Time traveller? Tinkerer? Find your museum alter ego and a tour that fits.</p></div>
-          <button className="button button-dark" aria-haspopup="dialog" onClick={(event) => { event.currentTarget.focus({ preventScroll: true }); onQuiz() }}>Find my explorer type <ArrowRight size={16} /></button>
+          {explorerType ? <ExplorerSticker type={explorerType} className="explorer-adventure-sticker" /> : <span className="explorer-adventure-icon" aria-hidden="true"><Compass size={25} /><i /><i /></span>}
+          {explorerType
+            ? <div><p className="kicker">Your explorer type</p><h3>You’re {explorerType.label}.</h3><p>{explorerType.tagline} Show your card at the welcome desk to collect your sticker.</p></div>
+            : <div><p className="kicker">Six questions. {explorerTypes.length} explorer types.</p><h3>What’s your explorer type?</h3><p>Time Traveller? Codebreaker? Night Owl? Find your museum alter ego, a tour that fits and a sticker to keep.</p></div>}
+          <button className="button button-dark" aria-haspopup="dialog" onClick={(event) => { event.currentTarget.focus({ preventScroll: true }); onQuiz() }}>{explorerType ? 'See my explorer card' : 'Find my explorer type'} <ArrowRight size={16} /></button>
         </article>
         <article className="explorer-adventure explorer-mystery">
           <div className="explorer-trail-top"><span className="explorer-adventure-icon" aria-hidden="true">{complete ? <Check size={25} /> : <KeyRound size={25} />}</span><ol aria-label="Mystery trail progress">{mysteryStops.map((stop, index) => <li key={stop.id} className={index < trail.step ? 'done' : ''} aria-current={trail.started && index === trail.step ? 'step' : undefined}><span className="sr-only">Stop {index + 1}{index < trail.step ? ', solved' : ''}</span>{index < trail.step ? <Check size={13} aria-hidden="true" /> : <span aria-hidden="true">{index + 1}</span>}</li>)}</ol></div>

@@ -1,81 +1,24 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
-import { ArrowLeft, ArrowRight, Clock, Compass, MapPin, RotateCcw, X } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Clock, Compass, Download, MapPin, RotateCcw, Share2, Sparkles, Sticker, X } from 'lucide-react'
 import { exhibits, tours } from './data'
+import { ExplorerCard } from './ExplorerSticker'
+import { explorerQuestions as questions, explorerTypeKey, scoreExplorer, type ExplorerType } from './explorerTypes'
 import './ExplorerQuiz.css'
 
-type TourId = 'ai-edit' | 'under-the-hood' | 'front-of-house' | 'safe-and-sound' | 'grow-your-career' | 'heart-of-westpac' | 'first-look'
-type Option = { label: string; detail: string; points: Partial<Record<TourId, number>> }
-type Question = { prompt: string; options: Option[] }
-
-// Q1 sets your main interest (3 points); Q2 (style) and Q3 (time) nudge the result.
-// Ties go to your Q1 pick, then to the order tours are listed in data.ts.
-const questions: Question[] = [
-  {
-    prompt: 'Which gallery do you wander into first?',
-    options: [
-      { label: 'The future wing', detail: 'Robots, quantum and whatever comes next', points: { 'ai-edit': 3 } },
-      { label: 'The workshop', detail: 'I want to see how it’s built', points: { 'under-the-hood': 3 } },
-      { label: 'The shopfront', detail: 'What our customers actually see and use', points: { 'front-of-house': 3 } },
-      { label: 'The vault', detail: 'Locks, alarms and keeping things running', points: { 'safe-and-sound': 3 } },
-      { label: 'The study hall', detail: 'New skills and my next career move', points: { 'grow-your-career': 3 } },
-      { label: 'The people’s gallery', detail: 'Stories, communities and causes', points: { 'heart-of-westpac': 3 } },
-    ],
-  },
-  {
-    prompt: 'Pick your explorer style.',
-    options: [
-      { label: 'Skim the highlights', detail: 'Best bits only, no jargon please', points: { 'first-look': 3, 'heart-of-westpac': 1 } },
-      { label: 'Chat with the guides', detail: 'I’ll ask the hosts a hundred questions', points: { 'front-of-house': 1, 'grow-your-career': 1, 'heart-of-westpac': 1 } },
-      { label: 'Open the display case', detail: 'Give me the technical detail', points: { 'under-the-hood': 2, 'ai-edit': 1, 'safe-and-sound': 1 } },
-    ],
-  },
-  {
-    prompt: 'How long is your expedition?',
-    options: [
-      { label: 'A quick 20-minute loop', detail: 'I’ve got a meeting soon', points: { 'first-look': 2, 'safe-and-sound': 1, 'heart-of-westpac': 1 } },
-      { label: 'About half an hour', detail: 'Time for a proper look', points: { 'ai-edit': 1, 'front-of-house': 1, 'grow-your-career': 1 } },
-      { label: '40 minutes or more', detail: 'Pack my snacks, I’m here a while', points: { 'under-the-hood': 1, 'front-of-house': 1, 'grow-your-career': 1 } },
-    ],
-  },
-]
-
-const explorerTypes: Record<TourId, { label: string; tagline: string }> = {
-  'ai-edit': { label: 'The Time Traveller', tagline: 'You skip the past and head straight for tomorrow.' },
-  'under-the-hood': { label: 'The Tinkerer', tagline: 'You read the plaque, then ask how the exhibit was built.' },
-  'front-of-house': { label: 'The Concierge', tagline: 'You see every exhibit through a customer’s eyes.' },
-  'safe-and-sound': { label: 'The Vault Keeper', tagline: 'You notice the alarms before the artwork.' },
-  'grow-your-career': { label: 'The Apprentice Adventurer', tagline: 'Every gallery is a chance to level up.' },
-  'heart-of-westpac': { label: 'The Storyteller', tagline: 'You come for the people behind the exhibits.' },
-  'first-look': { label: 'The Speed Sightseer', tagline: 'Highlights in, jargon out, back before your coffee cools.' },
-}
-
 type Answers = (number | null)[]
-
-function recommendTour(answers: Answers): string {
-  const scores = new Map<string, number>(tours.map((tour) => [tour.id, 0]))
-  answers.forEach((answer, index) => {
-    if (answer === null) return
-    const option = questions[index].options[answer]
-    for (const [id, points] of Object.entries(option.points)) scores.set(id, (scores.get(id) ?? 0) + (points ?? 0))
-  })
-  const interest = answers[0] === null ? undefined : Object.keys(questions[0].options[answers[0]].points)[0]
-  let best = tours[0].id
-  for (const tour of tours) {
-    const score = scores.get(tour.id)!
-    const top = scores.get(best)!
-    if (score > top || (score === top && tour.id === interest)) best = tour.id
-  }
-  return best
-}
-
 const emptyAnswers = (): Answers => questions.map(() => null)
+const canShareFiles = typeof navigator.canShare === 'function' && navigator.canShare({ files: [new File([], 'test.png', { type: 'image/png' })] })
 
-export function ExplorerQuiz({ onChoose, onClose }: { onChoose: (tourId: string) => void; onClose: () => void }) {
+export function ExplorerQuiz({ saved, onResult, onChoose, onClose }: { saved?: ExplorerType; onResult: (type: ExplorerType) => void; onChoose: (tourId: string) => void; onClose: () => void }) {
   const dialogRef = useRef<HTMLDialogElement>(null)
   const headingRef = useRef<HTMLHeadingElement>(null)
+  const cardRef = useRef<HTMLDivElement>(null)
   const firstRender = useRef(true)
   const [answers, setAnswers] = useState<Answers>(emptyAnswers)
-  const [step, setStep] = useState(0)
+  // Someone who has already taken the quiz goes straight to their card.
+  const [step, setStep] = useState(saved ? questions.length : 0)
+  const [result, setResult] = useState(saved)
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     const dialog = dialogRef.current
@@ -95,26 +38,56 @@ export function ExplorerQuiz({ onChoose, onClose }: { onChoose: (tourId: string)
   }, [step])
 
   const choose = (index: number) => {
-    setAnswers((current) => current.map((answer, i) => (i === step ? index : answer)))
-    setStep((current) => current + 1)
+    const next = answers.map((answer, i) => (i === step ? index : answer))
+    setAnswers(next)
+    setStep(step + 1)
+    if (step < questions.length - 1) return
+    const type = scoreExplorer(next as number[])
+    setResult(type)
+    localStorage.setItem(explorerTypeKey, type.id)
+    onResult(type)
   }
   const retake = () => { setAnswers(emptyAnswers()); setStep(0) }
   const close = () => { dialogRef.current?.close(); onClose() }
 
-  const finished = step >= questions.length
-  const tour = finished ? tours.find((item) => item.id === recommendTour(answers))! : null
-  const type = tour ? explorerTypes[tour.id as TourId] : null
+  // Download the card, or hand it to the share sheet where the device supports it.
+  const saveCard = async (share: boolean) => {
+    if (!cardRef.current || !result) return
+    setSaving(true)
+    try {
+      const { toBlob } = await import('html-to-image')
+      const blob = await toBlob(cardRef.current, { pixelRatio: 4, style: { boxShadow: 'none' } })
+      if (!blob) return
+      const fileName = `techx26-${result.id}-explorer-card.png`
+      if (share) {
+        await navigator.share({ files: [new File([blob], fileName, { type: 'image/png' })], text: `I’m ${result.label} at the TECHx26 Museum of Technology. #TECHx26` })
+        return
+      }
+      const link = document.createElement('a')
+      link.download = fileName
+      link.href = URL.createObjectURL(blob)
+      link.click()
+      setTimeout(() => URL.revokeObjectURL(link.href), 1000)
+    } catch {
+      // The visitor closed the share sheet.
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const finished = step >= questions.length && result
+  const tour = finished ? tours.find((item) => item.id === result.tour)! : null
 
   return (
     <dialog
       ref={dialogRef}
-      className="explorer-quiz"
+      className={finished ? 'explorer-quiz is-result' : 'explorer-quiz'}
       aria-labelledby="explorer-quiz-title"
       onCancel={(event) => { event.preventDefault(); close() }}
       onClick={(event) => { if (event.target === event.currentTarget) close() }}
     >
+      <button type="button" className="explorer-quiz-close" onClick={close} aria-label="Close explorer quiz"><X size={18} /></button>
       <div className="explorer-quiz-inner">
-        <button type="button" className="explorer-quiz-close" onClick={close} aria-label="Close explorer quiz"><X size={18} /></button>
         <p className="explorer-quiz-kicker"><Compass size={13} aria-hidden="true" />What kind of explorer are you?</p>
 
         {!finished ? (
@@ -134,14 +107,22 @@ export function ExplorerQuiz({ onChoose, onClose }: { onChoose: (tourId: string)
             </div>
             <div className="explorer-quiz-nav">
               {step > 0 ? <button type="button" className="explorer-quiz-link" onClick={() => setStep(step - 1)}><ArrowLeft size={14} aria-hidden="true" />Back</button> : <span />}
-              {answers[step] !== null && <button type="button" className="explorer-quiz-link" onClick={() => setStep(step + 1)}>Keep answer<ArrowRight size={14} aria-hidden="true" /></button>}
+              {answers[step] !== null && <button type="button" className="explorer-quiz-link" onClick={() => choose(answers[step]!)}>Keep answer<ArrowRight size={14} aria-hidden="true" /></button>}
             </div>
           </>
-        ) : tour && type && (
+        ) : tour && (
           <div className="explorer-quiz-result" style={{ '--tour-colour': tour.colour } as CSSProperties}>
             <p className="explorer-quiz-count">You’re</p>
-            <h2 id="explorer-quiz-title" ref={headingRef} tabIndex={-1}>{type.label}</h2>
-            <p className="explorer-quiz-tagline">{type.tagline}</p>
+            <h2 id="explorer-quiz-title" ref={headingRef} tabIndex={-1}>{result.label}</h2>
+            <p className="explorer-quiz-tagline">{result.tagline}</p>
+            <div className="explorer-quiz-collect">
+              <Sticker size={22} aria-hidden="true" />
+              <p><strong>Collect your sticker</strong>Show this card at the welcome desk to pick up your {result.short} sticker.</p>
+            </div>
+            <div className="explorer-quiz-save" aria-busy={saving}>
+              <button type="button" className="explorer-quiz-secondary" onClick={() => saveCard(false)} disabled={saving}><Download size={15} aria-hidden="true" />Save my card</button>
+              {canShareFiles && <button type="button" className="explorer-quiz-secondary" onClick={() => saveCard(true)} disabled={saving}><Share2 size={15} aria-hidden="true" />Share</button>}
+            </div>
             <div className="explorer-quiz-tour">
               <p className="explorer-quiz-count">Your tour · {tour.audience}</p>
               <h3>{tour.title}</h3>
@@ -158,9 +139,21 @@ export function ExplorerQuiz({ onChoose, onClose }: { onChoose: (tourId: string)
               <button type="button" className="explorer-quiz-primary" onClick={() => { dialogRef.current?.close(); onChoose(tour.id) }}>Start this tour<ArrowRight size={16} aria-hidden="true" /></button>
               <button type="button" className="explorer-quiz-secondary" onClick={retake}><RotateCcw size={14} aria-hidden="true" />Retake</button>
             </div>
-            <button type="button" className="explorer-quiz-link explorer-quiz-back" onClick={() => setStep(questions.length - 1)}><ArrowLeft size={14} aria-hidden="true" />Change my last answer</button>
+            {answers[questions.length - 1] !== null && <button type="button" className="explorer-quiz-link explorer-quiz-back" onClick={() => setStep(questions.length - 1)}><ArrowLeft size={14} aria-hidden="true" />Change my last answer</button>}
           </div>
         )}
+      </div>
+      {/* The card waits face down while you answer, then flips to reveal your type. */}
+      <div className="explorer-quiz-stage" aria-hidden={!finished} style={result ? { '--from': result.colours[0] } as CSSProperties : undefined}>
+        <div className={finished ? 'explorer-flip revealed' : 'explorer-flip'}>
+          <div className="explorer-flip-back">
+            <span className="brand-mark">TECH<span>x</span>26</span>
+            <span className="explorer-flip-seal"><Sparkles size={34} strokeWidth={1.5} /></span>
+            <strong>Your explorer card</strong>
+            <small>{finished ? '' : `${questions.length - step} question${questions.length - step === 1 ? '' : 's'} to reveal`}</small>
+          </div>
+          <div className="explorer-flip-front">{result && <ExplorerCard ref={cardRef} type={result} />}</div>
+        </div>
       </div>
     </dialog>
   )

@@ -30,8 +30,13 @@ jobs:
       # Local installs may record Westpac's internal registry, which GitHub can't reach; use the public one.
       - run: sed -i 's#https://artifactory.srv.westpac.com.au/artifactory/api/npm/wdp-001_npm_virtual/#https://registry.npmjs.org/#g' package-lock.json
       - run: npm ci
-      # Pages serves the site from /<repo name>/.
+      # Pages serves the site from /<repo name>/. The live leaderboard stays off until both repository variables are set.
+      # TRUSTED_NETWORKS limits the site to those networks; the build only publishes fingerprints of them.
       - run: npm run build -- --base=/${{ github.event.repository.name }}/
+        env:
+          TRUSTED_NETWORKS: ${{ secrets.TRUSTED_NETWORKS }}
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
       # Pages has no rewrites, so booth and secret QR links (/exhibits/…, /secret/…) fall back to the app via 404.html.
       - run: cp dist/index.html dist/404.html
       - uses: actions/upload-pages-artifact@v3

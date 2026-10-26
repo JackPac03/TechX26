@@ -5,6 +5,7 @@
 .explorer-personality { background: radial-gradient(ellipse at 90% 0%, #eedff0, transparent 70%), #faf7f9; }
 .explorer-adventure-icon { position: relative; display: grid; place-items: center; width: 48px; height: 48px; border: 1px solid #dac9df; border-radius: 50%; color: #8f1b76; background: #f5eaf5; }
 .explorer-adventure-icon i { position: absolute; width: 4px; height: 4px; background: #c31672; border-radius: 50%; right: -10px; top: 5px; }
+.explorer-adventure-sticker { width: 84px; height: 84px; rotate: -8deg; filter: drop-shadow(0 8px 14px rgba(22,12,25,.22)); }
 .explorer-adventure-icon i:last-child { width: 3px; height: 3px; right: 4px; top: -8px; background: #9619df; }
 .explorer-adventure .kicker { margin-bottom: 10px; color: #8f1b76; font-size: 9px; line-height: 1.6; }
 .explorer-adventure h3 { margin: 0 0 12px; font-size: clamp(22px, 2.2vw, 30px); letter-spacing: -.04em; line-height: 1.15; }
