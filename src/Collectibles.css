@@ -101,6 +101,4 @@
 .qr-poster-secret .qr-poster-icon svg { width: 34px; height: 34px; }
 
 /* Admin list of hidden exhibits */
-.admin-subhead { margin: 44px 0 6px; font-size: 24px; letter-spacing: -.03em; }
-.admin-note { margin: 0; color: #6f6873; font-size: 13px; line-height: 1.6; }
 .admin-table .secret-art { stroke-width: 3; }

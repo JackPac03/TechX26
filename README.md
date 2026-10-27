@@ -15,7 +15,7 @@ Create a production build with `npm run build`.
 
 This prototype uses React, TypeScript and browser storage. Everything works on the device alone. The optional live leaderboard below adds a shared Supabase database for nicknames and points.
 
-The built-in camera scanner reads QR codes at each booth, reveals the corresponding exhibit and awards its passport stamp. Codes can deep-link to `/exhibits/:id`; manual booth-code entry remains available for accessibility and camera failures.
+The built-in camera scanner reads QR codes at each booth, reveals the corresponding exhibit and awards its passport stamp. Codes deep-link to `/exhibits/:code`, where each booth has a random 6-character stamp code (`boothCodes` in `src/data.ts`), so stamps can't be collected by guessing links. The code is also printed under the QR on each poster, for typing in if the camera fails. Stamps can only be collected by scanning or typing that code.
 
 ## Westpac Wi-Fi only
 
@@ -26,6 +26,10 @@ The site only opens on trusted networks, such as Westpac Wi-Fi. Everyone else se
 - The check runs in the browser, so it keeps ordinary visitors out but someone technical could get around it. If Cloudflare can't be reached, the site opens rather than locking everyone out.
 - To find a network's address, connect to it, turn off mobile data and Private Relay, and open https://www.cloudflare.com/cdn-cgi/trace. The entrance page also shows the address it saw.
 - For local testing, put `TRUSTED_NETWORKS=...` in `.env.local`, which git ignores.
+
+## Admin
+
+Admin (in the footer) has challenge demos for booth hosts and the organisers' event tools: switches, a to-do list, the challenge library and the Print shop (venue posters, booth QR posters and explorer stickers). It's open to anyone who has the site.
 
 ## Live leaderboard (Supabase)
 

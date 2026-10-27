@@ -25,13 +25,13 @@ import {
   Trophy,
   X,
 } from 'lucide-react'
-import { boothGuides, boothNumber, eventDate, exhibits, exhibitUrl, tours, wings, type Exhibit } from './data'
+import { boothGuides, boothNumber, eventDate, exhibitForCode, exhibits, exhibitUrl, tours, wings, type Exhibit } from './data'
 import { BoothArt } from './BoothArt'
 import { ChallengeSheet } from './ChallengeSheet'
 import { challengeKinds, challenges as boothChallenges } from './challenges'
 import { Leaderboard } from './Leaderboard'
 import { AdminPanel } from './Admin'
-import { playerCode, readPlayer, readResults, totalScore } from './scoring'
+import { playerCode, readPlayer, readResults, recordResultTime, resultTimesKey, totalScore } from './scoring'
 import { queueProgress, syncEnabled } from './sync'
 import { QrStudio } from './QrStudio'
 import { Schedule } from './Schedule'
@@ -70,7 +70,7 @@ const readLockdown = () => {
 }
 const startsLocked = readLockdown()
 
-// Opening a booth's QR link (/exhibits/:id) reveals that booth and collects its stamp.
+// Opening a booth's QR link (/exhibits/:code) reveals that booth and collects its stamp.
 const linkedExhibit = exhibits.find((exhibit) => (window.location.origin + window.location.pathname).replace(/\/$/, '') === exhibitUrl(exhibit.id))
 const linkedIsNew = Boolean(linkedExhibit && !readIds('techx26-visited').includes(linkedExhibit.id))
 // Secret QR codes (/secret/:code) reveal a hidden exhibit.
@@ -112,7 +112,7 @@ function ScannerModal({ onClose, onScan }: { onClose: () => void; onScan: (value
   }
 
   const submitCode = () => {
-    if (!onScan(code.trim())) setError('That booth code was not recognised. Enter the booth number, e.g. 13.')
+    if (!onScan(code.trim())) setError('That code wasn’t recognised. Enter the 6-character code printed under the booth’s QR code.')
   }
 
   return (
@@ -136,7 +136,7 @@ function ScannerModal({ onClose, onScan }: { onClose: () => void; onScan: (value
         ) : (
           <form className="booth-code-form" onSubmit={(event) => { event.preventDefault(); submitCode() }}>
             <label htmlFor="booth-code">Booth code</label>
-            <div><input id="booth-code" value={code} onChange={(event) => setCode(event.target.value)} placeholder="e.g. 13" autoFocus /><button type="submit"><ArrowRight /></button></div>
+            <div><input id="booth-code" value={code} onChange={(event) => setCode(event.target.value)} placeholder="e.g. k7q2xm" maxLength={6} autoCapitalize="none" autoCorrect="off" spellCheck={false} autoFocus /><button type="submit"><ArrowRight /></button></div>
           </form>
         )}
         <p className="scanner-privacy">Camera footage stays on your device and is never recorded.</p>
@@ -330,6 +330,7 @@ function App() {
 
   const completeChallenge = (id: string, points: number) => {
     const next = { ...results, [id]: Math.max(results[id] ?? 0, points) }
+    if (next[id] !== results[id]) recordResultTime(id)
     setResults(next)
     localStorage.setItem('techx26-results', JSON.stringify(next))
   }
@@ -340,7 +341,7 @@ function App() {
   }
 
   const resetProgress = () => {
-    for (const key of ['techx26-visited', 'techx26-challenges', 'techx26-results', 'techx26-player', 'techx26-surprise-picks', 'techx26-curator-secret', trailKey, secretsKey, stampTimesKey, 'techx26-x-found', 'techx26-night-found', 'techx26-guard-found', 'techx26-night-finds', explorerTypeKey]) localStorage.removeItem(key)
+    for (const key of ['techx26-visited', 'techx26-challenges', 'techx26-results', 'techx26-player', 'techx26-surprise-picks', 'techx26-curator-secret', trailKey, secretsKey, stampTimesKey, resultTimesKey, 'techx26-x-found', 'techx26-night-found', 'techx26-guard-found', 'techx26-night-finds', explorerTypeKey]) localStorage.removeItem(key)
     setVisited([])
     setFound([])
     setXFound(false)
@@ -555,8 +556,7 @@ function App() {
       collectSecret(secret)
       return true
     }
-    const code = value.trim().toLowerCase().split('/').filter(Boolean).pop() ?? ''
-    const exhibit = exhibits.find((item) => item.id === code || Number(code) === item.booth)
+    const exhibit = exhibitForCode(value.trim().split('/').filter(Boolean).pop() ?? '')
     if (!exhibit) return false
     stampExhibit(exhibit.id)
     setScanOpen(false)
@@ -878,9 +878,9 @@ function App() {
               )}
               <div className="booth-ask"><small><MessageCircle size={13} /> Ask the team</small><ul>{boothGuides[selectedExhibit.id].ask.map((question) => <li key={question}>{question}</li>)}</ul></div>
               <div className="modal-actions">
-                {!lockdown && <button className={visited.includes(selectedExhibit.id) ? 'stamp-button done' : 'stamp-button'} onClick={() => stampExhibit(selectedExhibit.id)} aria-pressed={visited.includes(selectedExhibit.id)}>
+                {!lockdown && <button className={visited.includes(selectedExhibit.id) ? 'stamp-button done' : 'stamp-button'} onClick={() => visited.includes(selectedExhibit.id) ? stampExhibit(selectedExhibit.id) : setScanOpen(true)} aria-pressed={visited.includes(selectedExhibit.id) || undefined}>
                   <span className="stamp-button-seal" aria-hidden="true">{visited.includes(selectedExhibit.id) ? <Check size={19} /> : <Star size={18} />}</span>
-                  <span className="stamp-button-copy"><b>{mysteryMatch && visited.includes(selectedExhibit.id) ? 'Confirm this stop' : visited.includes(selectedExhibit.id) ? 'Stamp collected' : 'Collect passport stamp'}</b><small>{visited.includes(selectedExhibit.id) ? `${visited.length} of ${exhibits.length} in your passport` : 'Add this booth to your passport'}</small></span>
+                  <span className="stamp-button-copy"><b>{mysteryMatch && visited.includes(selectedExhibit.id) ? 'Confirm this stop' : visited.includes(selectedExhibit.id) ? 'Stamp collected' : 'Scan to collect your stamp'}</b><small>{visited.includes(selectedExhibit.id) ? `${visited.length} of ${exhibits.length} in your passport` : 'Scan the QR code at this booth'}</small></span>
                 </button>}
                 {nextUp && (
                   <button className="next-stop" onClick={() => openExhibit(nextUp.exhibit)} style={{ '--accent': wings.find((wing) => wing.id === nextUp.exhibit.wingId)!.colour } as React.CSSProperties}>
@@ -898,7 +898,7 @@ function App() {
         </div>
       )}
 
-      {adminOpen ? <AdminPanel lockdown={lockdown} lockdownSet={localStorage.getItem(lockdownKey) !== null} onLockdown={changeLockdown} demo={demoBoard} onDemo={showDemoBoard} onTry={(id) => setPlaying({ id, demo: true })} onReset={resetProgress} onClose={() => setAdminOpen(false)}>{challengeSheet}</AdminPanel> : challengeSheet}
+      {adminOpen ? <AdminPanel lockdown={lockdown} lockdownSet={localStorage.getItem(lockdownKey) !== null} onLockdown={changeLockdown} demo={demoBoard} onDemo={showDemoBoard} onTry={(id) => setPlaying({ id, demo: true })} onReset={resetProgress} onBoothPosters={() => { setAdminOpen(false); setQrOpen(true) }} onClose={() => setAdminOpen(false)}>{challengeSheet}</AdminPanel> : challengeSheet}
 
       {info && <InfoSheet topic={info} onClose={() => setInfo(null)} />}
 

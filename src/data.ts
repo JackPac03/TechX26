@@ -164,5 +164,60 @@ export const schedule: Session[] = [
 
 export const boothNumber = (exhibit: Exhibit) => String(exhibit.booth).padStart(2, '0')
 
+// Each booth's stamp code: in its QR link, and printed under the QR to type in if scanning fails.
+// They're random, so stamps can't be collected by guessing links or typing booth numbers.
+export const boothCodes: Record<string, string> = {
+  'sns': 'ws2wam',
+  'engineering-collaboration-tools': '2vpwpa',
+  'digital-strategy': 'ebx7nu',
+  'technology-strategy': 'gpdnrq',
+  'emerging-technology': '9hmajt',
+  'cloud-contact-centres': '2krhuz',
+  'ecm-customer': 'e5sskm',
+  'book-a-banker': 'qb3xbr',
+  'loan-builder': 'ecfva4',
+  'merchant-banking': '6gfvxs',
+  'westpac-one': 'hs65zp',
+  'everyday-banking': 'eu7kvq',
+  'cloud-services': 'behbyc',
+  'ecm-perform': 'p84rwv',
+  'ethan-indigenous': 'bc2pgd',
+  'tour-de-cure': 'vfuq8a',
+  'asset-management': 'ks4ed2',
+  'bcm': 't3upfa',
+  'testing': 'u4q7qw',
+  'family-feud': 'txetcd',
+  'cyber-trusted-access': '6vqtdr',
+  'cyber-job-zero': 'ujk7pj',
+  'cyber-critical-systems': 'xxdr82',
+  'cyber-threats-247': 'vzqbya',
+  'cyber-people-safe': 'k9b9rp',
+  'eag': 'kc6jbf',
+  'linkedin-learning': 'w2qdbd',
+  'people-tools': '8cdp72',
+  'motivate-plus': 'yq8wfm',
+  'emerging-talent': 'jbtdc6',
+  'head-shot-photo-booth': '5afqbc',
+  'women-in-technology': 'rhk8wm',
+  'dei-rising-women': '6x6a8v',
+  'engineering-practice': 'qh2syq',
+  'architecture-practice': 'q8e6cf',
+  'design-practice': 'zpa7s8',
+  'data-ai-practice': 'bdejs5',
+  'product-ownership-practice': 'dn5bp3',
+  'delivery-practice': 'rw7pvv',
+  'service-operations': 'da6ydf',
+  'ai-sdlc': 'pw7tmb',
+  'wdlc': 'su23w4',
+  'snowflake-adapt': 'dm6shs',
+  'github': 'bxwn86',
+  'jira-confluence': '8ytj9v',
+  'engineering-excellence': '2very4',
+}
+export const exhibitForCode = (code: string) => exhibits.find((exhibit) => boothCodes[exhibit.id] === code.trim().toLowerCase())
+
+// The guide's home page, for posters.
+export const siteUrl = () => `${window.location.origin}${import.meta.env.BASE_URL}`
+
 // Booth QR codes deep-link here; opening the link reveals the booth and awards its stamp.
-export const exhibitUrl = (id: string) => `${window.location.origin}${import.meta.env.BASE_URL}exhibits/${id}`
+export const exhibitUrl = (id: string) => `${window.location.origin}${import.meta.env.BASE_URL}exhibits/${boothCodes[id]}`

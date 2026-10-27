@@ -29,7 +29,7 @@ export function ExplorerAdventures({ explorerType, trail, onStart, onPause, onHi
             <h3>{complete ? 'A certified Trailblazer.' : 'A clue less ordinary.'}</h3>
             <p>{complete ? 'You followed the clues and found your way. Your secret badge is waiting in your passport.' : trail.started ? clue.clue : 'Follow a clue, find its booth and collect a stamp. Each discovery reveals the next.'}</p>
           </div>
-          {trail.started && !complete && <small className="explorer-trail-note">Scan or collect the right booth’s stamp to solve this clue. Already stamped it? Confirm that stop in its booth.</small>}
+          {trail.started && !complete && <small className="explorer-trail-note">Scan the right booth’s QR code to solve this clue. Already stamped it? Confirm that stop in its booth.</small>}
           <div className="explorer-trail-actions">
             {complete ? <a className="button button-dark" href="#passport">See my badge <ArrowRight size={16} /></a> : trail.started ? <><button className="button button-dark" onClick={onHint}><MapPin size={15} /> Hint on the map</button><button className="text-button" onClick={onPause}>Pause trail</button></> : <button className="button button-dark" onClick={onStart}>{trail.step ? 'Resume the trail' : 'Start the mystery trail'} <ArrowRight size={16} /></button>}
           </div>

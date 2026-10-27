@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { ArrowLeft, ArrowRight, Download, KeyRound, Printer, X } from 'lucide-react'
-import type { EncodeHintType } from '@zxing/library'
-import { boothNumber, exhibits, exhibitUrl, wings } from './data'
+import { boothCodes, boothNumber, exhibits, exhibitUrl, wings } from './data'
 import { secretPoints } from './scoring'
 import { secrets, secretUrl } from './secrets'
+import { useQrRows } from './qr'
 
 const booths = [...exhibits].sort((a, b) => a.booth - b.booth)
 // Booth posters first, then the secret posters for hidden exhibits.
@@ -13,22 +13,10 @@ const items = [...booths.map((exhibit) => ({ key: exhibit.id, exhibit, secret: u
 export function QrStudio({ onClose }: { onClose: () => void }) {
   const [index, setIndex] = useState(0)
   const posterRef = useRef<HTMLElement>(null)
-  const [qr, setQr] = useState<{ url: string; rows: boolean[][] } | null>(null)
   const { exhibit, secret } = items[index]
   const wing = exhibit && wings.find((item) => item.id === exhibit.wingId)!
   const url = exhibit ? exhibitUrl(exhibit.id) : secretUrl(secret!)
-  const rows = qr?.url === url ? qr.rows : null
-
-  useEffect(() => {
-    let current = true
-    import('@zxing/library').then(({ BarcodeFormat, EncodeHintType, QRCodeWriter }) => {
-      const hints = new Map<EncodeHintType, unknown>([[EncodeHintType.MARGIN, 0], [EncodeHintType.ERROR_CORRECTION, 'M']])
-      const bits = new QRCodeWriter().encode(url, BarcodeFormat.QR_CODE, 0, 0, hints)
-      const matrix = Array.from({ length: bits.getHeight() }, (_, y) => Array.from({ length: bits.getWidth() }, (_, x) => bits.get(x, y)))
-      if (current) setQr({ url, rows: matrix })
-    })
-    return () => { current = false }
-  }, [url])
+  const rows = useQrRows(url)
 
   const step = (delta: number) => setIndex((index + delta + items.length) % items.length)
 
@@ -74,7 +62,7 @@ export function QrStudio({ onClose }: { onClose: () => void }) {
         <article className={secret ? 'qr-poster qr-poster-secret' : 'qr-poster'} ref={posterRef} style={{ '--accent': wing?.colour ?? '#c31672' } as React.CSSProperties}>
           <div className="qr-poster-top">
             <span className="brand-mark">TECH<span>x</span>26</span>
-            <span className="qr-poster-code"><small>{exhibit ? 'Booth code' : 'Hidden exhibit'}</small>{exhibit ? boothNumber(exhibit) : '???'}</span>
+            <span className="qr-poster-code"><small>{exhibit ? 'Booth' : 'Hidden exhibit'}</small>{exhibit ? boothNumber(exhibit) : '???'}</span>
           </div>
           <div className="qr-poster-wing">
             <span className="qr-poster-icon" aria-hidden="true">{wing ? <span className={`wing-art art-${wing.id}`}><i /><i /><i /></span> : <KeyRound />}</span>
@@ -90,6 +78,7 @@ export function QrStudio({ onClose }: { onClose: () => void }) {
             ) : <span>Generating…</span>}
           </div>
           <p className="qr-poster-cta">{exhibit ? 'Scan to reveal the story and collect your passport stamp.' : `Scan to reveal it and earn ${secretPoints} bonus points.`}</p>
+          <p className="qr-poster-manual">Can’t scan? Enter code <b>{exhibit ? boothCodes[exhibit.id] : secret!.code}</b></p>
         </article>
       </section>
     </div>

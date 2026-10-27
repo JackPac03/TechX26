@@ -680,6 +680,8 @@ footer .footer-credit { margin: 0; padding: 18px 0 22px; border-top: 1px solid r
 .qr-code { aspect-ratio: 1; padding: 6px; display: grid; place-items: center; background: white; color: #6f6873; font-size: 12px; }
 .qr-code svg { display: block; width: 100%; height: 100%; fill: #160c19; }
 .qr-poster-cta { margin: 14px 0 0; font-size: 13px; font-weight: 600; text-align: center; }
+.qr-poster-manual { margin: 6px 0 0; color: #6f6873; font-size: 11px; text-align: center; }
+.qr-poster-manual b { color: var(--ink); font: 500 13px 'DM Mono', monospace; letter-spacing: .12em; text-transform: uppercase; }
 @media (max-width: 760px) {
   .qr-studio { grid-template-columns: minmax(0, 1fr); gap: 28px; padding: 36px 24px 28px; }
   .qr-poster { width: 100%; max-width: 360px; justify-self: center; }
@@ -1247,17 +1249,47 @@ footer .footer-credit { margin: 0; padding: 18px 0 22px; border-top: 1px solid r
 }
 
 /* Temporary admin panel */
-.admin-section { background: #e9e8e1; }
-.admin-dialog { width: min(1280px, calc(100% - 40px)); max-height: calc(100svh - 40px); padding: 32px; overflow-y: auto; overscroll-behavior: contain; border: 0; border-radius: 22px; color: var(--ink); box-shadow: 0 30px 90px rgba(0,0,0,.4); }
-.admin-dialog::backdrop { background: rgba(15,5,19,.76); backdrop-filter: blur(10px); }
-.admin-dialog-bar { position: sticky; top: -32px; z-index: 5; margin: -32px -32px 32px; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; background: #e9e8e1; border-bottom: 1px solid var(--line); }
-.admin-dialog-bar > span { color: #6f6873; font: 10px 'DM Mono', monospace; text-transform: uppercase; letter-spacing: .08em; }
-.admin-dialog-bar button { min-height: 40px; padding: 0 14px; display: inline-flex; align-items: center; gap: 10px; border: 1px solid #c9c2ca; border-radius: 99px; background: white; color: var(--ink); font-size: 12px; }
-.admin-dialog .admin-kinds { grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr)); }
-.admin-lockdown { margin: -24px 0 24px; padding: 18px 22px; border-radius: 22px; background: white; }
-.admin-lockdown p { margin: 8px 0 0 54px; color: #5f5763; font-size: 13px; line-height: 1.5; }
-.admin-lockdown .text-button { padding: 0; color: var(--ink); font-size: 13px; font-weight: 700; text-decoration: underline; }
-.admin-controls { margin: 0 0 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; }
+.admin-console { width: min(1320px, calc(100% - 40px)); height: calc(100svh - 40px); max-height: none; padding: 0; display: grid; grid-template: auto minmax(0, 1fr) / 232px minmax(0, 1fr); overflow: hidden; border: 0; border-radius: 26px; background: #efede6; color: var(--ink); box-shadow: 0 30px 90px rgba(0,0,0,.45); }
+.admin-console:not([open]) { display: none; }
+.admin-console-bar { grid-column: 1 / -1; padding: 14px 16px 14px 24px; display: flex; align-items: center; gap: 16px; background: var(--ink); color: white; }
+.admin-console-brand { min-width: 0; display: flex; align-items: center; gap: 14px; margin-right: auto; }
+.admin-console-mark { font-weight: 800; font-size: 18px; letter-spacing: -.03em; }
+.admin-console-mark span { color: #ff3d8b; }
+.admin-console-brand h2 { margin: 0; padding-left: 14px; border-left: 1px solid rgba(255,255,255,.22); color: rgba(255,255,255,.72); font: 500 11px 'DM Mono', monospace; letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; }
+.admin-console-status { display: flex; gap: 8px; }
+.admin-chip { min-height: 30px; padding: 0 12px; display: inline-flex; align-items: center; gap: 8px; border-radius: 15px; background: rgba(255,255,255,.1); color: rgba(255,255,255,.86); font-size: 12px; font-weight: 700; white-space: nowrap; }
+.admin-chip i { width: 8px; height: 8px; border-radius: 50%; background: #ffb020; box-shadow: 0 0 0 3px rgba(255,176,32,.25); }
+.admin-chip.live i { background: #2fd27f; box-shadow: 0 0 0 3px rgba(47,210,127,.25); }
+.admin-console-close { width: 42px; height: 42px; flex: none; display: grid; place-items: center; border: 0; border-radius: 50%; background: rgba(255,255,255,.1); color: white; transition: background .2s; }
+.admin-console-close:hover { background: rgba(255,255,255,.2); }
+.admin-console-nav { padding: 20px 14px; display: flex; flex-direction: column; gap: 4px; border-right: 1px solid var(--line); }
+.admin-console-nav button { min-height: 46px; padding: 0 14px; display: flex; align-items: center; gap: 12px; border: 0; border-radius: 14px; background: transparent; color: #5f5763; font-size: 14px; font-weight: 700; text-align: left; transition: background .2s, color .2s; }
+.admin-console-nav button:hover { background: rgba(22,12,25,.06); color: var(--ink); }
+.admin-console-nav button.active { background: var(--ink); color: white; }
+.admin-console-body { min-width: 0; padding: 28px 32px 48px; overflow-y: auto; overscroll-behavior: contain; }
+.admin-console-body > * + * { margin-top: 24px; }
+.admin-pane-head .kicker { margin: 0 0 6px; }
+.admin-pane-head h3 { margin: 0; font-size: 22px; letter-spacing: -.03em; }
+.admin-pane-head > p:not(.kicker) { margin: 6px 0 0; max-width: 680px; color: #6f6873; font-size: 13px; line-height: 1.6; }
+.admin-console-body > .admin-pane-head:not(:first-child) { margin-top: 44px; }
+.admin-hero { position: relative; padding: 30px 32px; overflow: hidden; border-radius: 24px; background: radial-gradient(circle at 88% 0%, rgba(255,61,139,.55), transparent 45%), radial-gradient(circle at 70% 120%, rgba(150,25,223,.55), transparent 50%), var(--ink); color: white; }
+.admin-hero .kicker { margin: 0; color: rgba(255,255,255,.7); }
+.admin-hero strong { margin: 10px 0 4px; display: block; font-size: clamp(36px, 5vw, 60px); line-height: 1; letter-spacing: -.05em; }
+.admin-hero > p:not(.kicker) { margin: 10px 0 0; color: rgba(255,255,255,.75); font-size: 14px; }
+.admin-stats { margin-top: 26px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.admin-stats span { padding: 14px 16px; display: grid; gap: 2px; border-radius: 16px; background: rgba(255,255,255,.1); color: rgba(255,255,255,.72); font-size: 12px; backdrop-filter: blur(6px); }
+.admin-stats b { color: white; font-size: 28px; letter-spacing: -.04em; }
+.admin-overview { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 16px; align-items: start; }
+.admin-card { padding: 22px; display: grid; gap: 14px; border-radius: 22px; background: white; }
+.admin-card .admin-reset { background: #f3f3ed; }
+.admin-card-note { margin: 0; color: #5f5763; font-size: 13px; line-height: 1.55; }
+.admin-card-note .text-button { padding: 0; color: var(--ink); font-size: 13px; font-weight: 700; text-decoration: underline; }
+.admin-card-actions { padding-top: 14px; display: flex; flex-wrap: wrap; gap: 10px; border-top: 1px solid #f0efe9; }
+.admin-progress { height: 8px; overflow: hidden; border-radius: 4px; background: #efeee8; }
+.admin-progress span { height: 100%; display: block; border-radius: inherit; background: linear-gradient(90deg, #c31672, #9619df); transition: width .3s; }
+.admin-print-qr { background: linear-gradient(120deg, white 55%, #f8e7f1); }
+.admin-print-qr .button { margin-top: 16px; }
+.admin-console::backdrop { background: rgba(15,5,19,.76); backdrop-filter: blur(10px); }
 .admin-switch { display: inline-flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 700; cursor: pointer; }
 .admin-switch input { position: absolute; opacity: 0; pointer-events: none; }
 .admin-switch span { position: relative; width: 44px; height: 26px; flex: none; border-radius: 13px; background: rgba(22,12,25,.2); transition: background .2s; }
@@ -1266,9 +1298,6 @@ footer .footer-credit { margin: 0; padding: 18px 0 22px; border-top: 1px solid r
 .admin-switch input:checked + span::after { transform: translateX(18px); }
 .admin-switch input:focus-visible + span { outline: 2px solid var(--ink); outline-offset: 2px; }
 .admin-reset { min-height: 40px; padding: 0 16px; display: inline-flex; align-items: center; gap: 8px; border: 0; border-radius: 20px; background: white; color: var(--ink); font-size: 13px; font-weight: 700; }
-.admin-todo { margin-bottom: 24px; padding: 20px 22px; border-radius: 22px; background: white; }
-.admin-todo h3 { margin: 0 0 10px; display: flex; align-items: baseline; justify-content: space-between; gap: 8px; font-size: 18px; letter-spacing: -.02em; }
-.admin-todo h3 small { color: #8b838e; font: 500 10px 'DM Mono', monospace; letter-spacing: .08em; text-transform: uppercase; }
 .admin-todo ul { margin: 0; padding: 0; list-style: none; }
 .admin-todo li + li { border-top: 1px solid #f0efe9; }
 .admin-todo label { padding: 11px 0; display: flex; align-items: flex-start; gap: 12px; color: #3d3540; font-size: 14px; line-height: 1.45; cursor: pointer; transition: color .2s; }
@@ -1286,7 +1315,7 @@ footer .footer-credit { margin: 0; padding: 18px 0 22px; border-top: 1px solid r
 .admin-kind p { margin: 0; color: #5f5763; font-size: 13px; line-height: 1.5; }
 .admin-kind .admin-kind-booths { color: #8b838e; font-size: 12px; }
 .admin-kind button { margin-top: auto; min-height: 42px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: 14px; background: var(--ink); color: white; font-size: 13px; font-weight: 700; }
-.admin-table-wrap { margin-top: 24px; overflow-x: auto; border-radius: 22px; background: white; }
+.admin-table-wrap { overflow-x: auto; border-radius: 22px; background: white; }
 .admin-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .admin-table th { padding: 14px 16px; color: #8b838e; font: 500 10px 'DM Mono', monospace; letter-spacing: .1em; text-align: left; text-transform: uppercase; }
 .admin-table td { padding: 10px 16px; border-top: 1px solid #f0efe9; white-space: nowrap; }
@@ -1303,10 +1332,23 @@ footer .footer-credit { margin: 0; padding: 18px 0 22px; border-top: 1px solid r
   .leaderboard-tabs > button { padding: 0 14px; }
   .leaderboard-list li { padding: 0 10px 0 6px; font-size: 14px; }
   .leaderboard-points { padding: 22px; border-radius: 22px; }
-  .admin-dialog { width: calc(100% - 24px); max-height: calc(100svh - 24px); padding: 20px; border-radius: 18px; }
-  .admin-dialog-bar { top: -20px; margin: -20px -20px 24px; padding: 12px 16px; }
-  .admin-lockdown { margin-top: -12px; }
-  .admin-lockdown p { margin-left: 0; }
+}
+
+@media (max-width: 900px) {
+  .admin-overview { grid-template-columns: minmax(0, 1fr); }
+  .admin-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 760px) {
+  .admin-console { width: 100%; height: 100svh; max-width: none; margin: 0; grid-template: auto auto minmax(0, 1fr) / minmax(0, 1fr); border-radius: 0; }
+  .admin-console-bar { padding: max(10px, env(safe-area-inset-top)) 10px 10px 16px; flex-wrap: wrap; gap: 8px 10px; }
+  .admin-console-brand { gap: 10px; }
+  .admin-console-brand h2 { padding-left: 10px; font-size: 10px; }
+  .admin-console-status { order: 3; width: 100%; }
+  .admin-console-nav { padding: 8px 10px; flex-direction: row; gap: 6px; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--line); scrollbar-width: none; }
+  .admin-console-nav button { min-height: 40px; padding: 0 14px; flex: none; gap: 8px; font-size: 13px; }
+  .admin-console-body { padding: 20px 14px max(40px, env(safe-area-inset-bottom)); }
+  .admin-hero { padding: 24px 20px; }
+  .admin-card { padding: 18px; }
 }
 
 /* Hero foyer: doors open onto a spotlit gallery where the X floats above the floor */
@@ -1393,4 +1435,12 @@ footer .footer-credit { margin: 0; padding: 18px 0 22px; border-top: 1px solid r
   /* Keep times clear of the timeline dot, and the sticky filters solid */
   .schedule-time { padding-right: 6px; }
   .filter-bar { background: rgba(233,227,232,.97); box-shadow: 0 10px 18px -16px rgba(22,12,25,.5); }
+}
+
+/* Very wide screens: content stops widening at about 1600px and moves in from the sides, while backgrounds
+   stay full width. Every gutter gets the same extra inset, so the header and footer still line up with the content. */
+@media (min-width: 1821px) {
+  .site-header, .app-shell > footer { padding-inline: calc(76px + (100% - 1820px) / 2); }
+  .hero, .scan-intro, .section, .passport-section, .scan-cta { padding-inline: calc(110px + (100% - 1820px) / 2); }
+  .map-section { padding-inline: calc(70px + (100% - 1820px) / 2); }
 }

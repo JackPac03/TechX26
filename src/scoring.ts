@@ -52,6 +52,19 @@ export const readResults = (): Record<string, number> => {
   }
 }
 
+// When each booth's best challenge score was set, so organisers can check how a winner's score built up.
+export const resultTimesKey = 'techx26-result-times'
+export const readResultTimes = (): Record<string, number> => {
+  try {
+    return JSON.parse(localStorage.getItem(resultTimesKey) ?? '{}')
+  } catch {
+    return {}
+  }
+}
+export const recordResultTime = (id: string) => {
+  localStorage.setItem(resultTimesKey, JSON.stringify({ ...readResultTimes(), [id]: Date.now() }))
+}
+
 // Live leaderboard rows arrive with their points already worked out.
 export type Entry = { name: string; code?: string; points?: number; you?: boolean; visited: string[]; results: Record<string, number>; secrets?: string[] }
 export const boothScore = (entry: Entry, id: string) => (entry.visited.includes(id) ? stampPoints : 0) + (entry.results[id] ?? 0)
