@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>Opening the TECHx26 Museum…</title>
+  <style>
+    html, body { height: 100%; margin: 0; background: #100913; color: rgba(255,255,255,.75); font: 15px/1.5 Manrope, -apple-system, Arial, sans-serif; }
+    body { display: grid; place-items: center; text-align: center; padding: 24px; box-sizing: border-box; }
+    main { max-width: 340px; }
+    b { display: block; margin-bottom: 10px; color: white; font-size: 34px; letter-spacing: -1px; }
+    b span { color: #ef1721; }
+    p { margin: 0 0 22px; }
+    .choices { display: grid; gap: 10px; }
+    .choices[hidden] { display: none; }
+    a { display: block; padding: 15px 18px; border-radius: 4px; color: white; font-weight: 600; text-decoration: none; }
+    .edge { background: linear-gradient(110deg, #ef1721, #c31672 55%, #9619df); }
+    .here { border: 1px solid rgba(255,255,255,.25); }
+  </style>
+</head>
+<body>
+  <!-- Booth and secret QR codes for the SharePoint version of the museum come through here, so the museum opens in a
+       browser rather than the SharePoint app, whose bars can't be hidden. A redirect from another site isn't handed to
+       the app. Microsoft Edge is Westpac's browser, signed in with work accounts, so this hands the link to Edge when it
+       can: microsoft-edge-https:// on iPhone and iPad, an intent naming Edge on Android (which falls back to the current
+       browser without Edge). Only the museum's SharePoint pages are allowed, with only a booth or secret code passed on. -->
+  <main>
+    <b>TECH<span>x</span>26</b>
+    <p id="status">Opening the museum…</p>
+    <div class="choices" id="choices" hidden>
+      <a class="edge" id="edge" href="#">Open in Microsoft Edge</a>
+      <a class="here" id="here" href="#">Continue in this browser</a>
+    </div>
+  </main>
+  <script>
+    var query = new URLSearchParams(location.search)
+    var page = query.get('p') || ''
+    var message = document.getElementById('status')
+    if (!/^\/sites\/[\w-]+\/SitePages\/[\w%.-]+\.aspx$/i.test(page)) {
+      message.textContent = 'This link isn’t a TECHx26 Museum link.'
+    } else {
+      var target = new URL('https://westpacgroup.sharepoint.com')
+      target.pathname = page
+      ;['booth', 'secret'].forEach(function (name) {
+        var code = query.get(name)
+        if (code && /^[a-z0-9]{4,10}$/i.test(code)) target.searchParams.set(name, code)
+      })
+      // SharePoint loads the page without its header and navigation.
+      target.searchParams.set('env', 'WebView')
+      var direct = target.href
+      var ua = navigator.userAgent
+      var inEdge = /\bEdg(iOS|A)?\//.test(ua)
+      var ios = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+      var android = /Android/.test(ua)
+      var edge = ios ? 'microsoft-edge-' + direct
+        : android ? 'intent://' + direct.slice('https://'.length) + '#Intent;scheme=https;package=com.microsoft.emmx;S.browser_fallback_url=' + encodeURIComponent(direct) + ';end'
+        : ''
+      if (inEdge || !edge) {
+        location.replace(direct)
+      } else {
+        message.textContent = 'Opening in Microsoft Edge, Westpac’s browser. Nothing happened?'
+        document.getElementById('edge').href = edge
+        document.getElementById('here').addEventListener('click', function (event) {
+          event.preventDefault()
+          location.replace(direct)
+        })
+        document.getElementById('choices').hidden = false
+        location.href = edge
+      }
+    }
+  </script>
+</body>
+</html>
